@@ -1,0 +1,35 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: backup-mongodb
+spec:
+  schedule: {{ .Values.backup.cron_for_full_backup |  quote }}
+  concurrencyPolicy: Forbid
+  suspend: false
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          serviceAccountName: sa-mongo-backup
+          containers:
+          - name: backup-mongodb-full
+            image: customs/mongobackup:latest
+            env:
+            - name: MONGO_URI
+              value: mongodb://{{ .Values.auth.rootUser }}:{{ .Values.auth.rootPassword }}@mongodb-0.mongodb-headless.{{ .Release.Namespace }}.svc.cluster.local:27017
+            - name: MONGO_OPLOG
+              value: "true"
+            - name: MONGO_BUCKET_URI
+              valueFrom:
+                secretKeyRef:
+                  name: mongo
+                  key: BUCKET_URI
+            - name: AWS_DEFAULT_REGION
+              valueFrom:
+                secretKeyRef:
+                  name: aws
+                  key: AWS_DEFAULT_REGION
