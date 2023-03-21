@@ -1,0 +1,9 @@
+affinity: 
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: "Infra-Services"
+            operator: In
+            values:
+            - "true"
