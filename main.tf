@@ -40,6 +40,7 @@ EOF
 }
 
 resource "kubernetes_namespace" "mongodb" {
+  count = var.create_namespace ? 1 : 0
   metadata {
     annotations = {}
 
