@@ -73,3 +73,9 @@ variable "cluster_name" {
   description = "Name of the EKS cluster"
   default     = ""
 }
+
+variable "create_namespace" {
+  type = string
+  description = "Set it to true to create given namespace"
+  default = true
+}
