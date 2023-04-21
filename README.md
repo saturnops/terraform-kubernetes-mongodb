@@ -9,24 +9,23 @@
 ```hcl
 module "mongodb" {
   source                   = "../../"
+  cluster_name             = "dev-skaf"
+  mongodb_config = {
+  name               = "skaf"
+  values_yaml        = file("./helm/values.yaml")
+  environment        = "prod"
+  volume_size        = "10Gi"
+  architecture       = "replicaset"
+  replica_count      = 2
+  storage_class_name = "gp2"  
+  }
+  mongodb_backup_config = {
+    s3_bucket_uri         = "s3://bucket-name"
+    s3_bucket_region      = "us-east-2"
+    cron_for_full_backup  = "*/2 * * * *"
+  }
   mongodb_backup_enabled   = true
-  mongodb_exporter_enabled = true
-  cluster_name             = "cluster_name"
-  mongodb_config       = {
-    name               = "skaf"
-    environment        = "prod"
-    volume_size        = "10Gi"
-    architecture       = "replicaset"
-    replica_count      = 2
-    storage_class_name = "gp2"
-  }
-  mongodb_backup_config   = {
-    s3_bucket_uri         = "s3://bucketname"
-    aws_access_key_id     = "aws_access_key_id"
-    aws_secret_access_key = "aws_secret_access_key"
-    s3_bucket_region      = "bucket_region"
-    cron_for_full_backup  = "* * * * *"
-  }
+  mongodb_exporter_enabled = true  
 }
 
 
@@ -86,9 +85,10 @@ No modules.
 | <a name="input_app_version"></a> [app\_version](#input\_app\_version) | Enter app version of application | `string` | `"5.0.8-debian-10-r9"` | no |
 | <a name="input_chart_version"></a> [chart\_version](#input\_chart\_version) | Enter chart version of application | `string` | `"13.1.5"` | no |
 | <a name="input_cluster_name"></a> [cluster\_name](#input\_cluster\_name) | Name of the EKS cluster | `string` | `""` | no |
-| <a name="input_mongodb_backup_config"></a> [mongodb\_backup\_config](#input\_mongodb\_backup\_config) | Mongodb Backup configurations | `any` | <pre>{<br>  "aws_access_key_id": "",<br>  "aws_secret_access_key": "",<br>  "cron_for_full_backup": "*/5 * * * *",<br>  "s3_bucket_region": "us-east-2",<br>  "s3_bucket_uri": ""<br>}</pre> | no |
+| <a name="input_create_namespace"></a> [create\_namespace](#input\_create\_namespace) | Set it to true to create given namespace | `string` | `true` | no |
+| <a name="input_mongodb_backup_config"></a> [mongodb\_backup\_config](#input\_mongodb\_backup\_config) | Mongodb Backup configurations | `any` | <pre>{<br>  "cron_for_full_backup": "*/5 * * * *",<br>  "s3_bucket_region": "us-east-2",<br>  "s3_bucket_uri": ""<br>}</pre> | no |
 | <a name="input_mongodb_backup_enabled"></a> [mongodb\_backup\_enabled](#input\_mongodb\_backup\_enabled) | Set true to enable mongodb backups | `bool` | `false` | no |
-| <a name="input_mongodb_config"></a> [mongodb\_config](#input\_mongodb\_config) | Mongodb configurations | `any` | <pre>{<br>  "architecture": "replicaset",<br>  "environment": "dev",<br>  "name": "skaf",<br>  "replica_count": 2,<br>  "storage_class_name": "gp2",<br>  "values_yaml": "",<br>  "volume_size": "50Gi"<br>}</pre> | no |
+| <a name="input_mongodb_config"></a> [mongodb\_config](#input\_mongodb\_config) | Mongodb configurations | `any` | <pre>{<br>  "architecture": "",<br>  "environment": "",<br>  "name": "",<br>  "replica_count": 2,<br>  "storage_class_name": "",<br>  "values_yaml": "",<br>  "volume_size": ""<br>}</pre> | no |
 | <a name="input_mongodb_exporter_config"></a> [mongodb\_exporter\_config](#input\_mongodb\_exporter\_config) | Mongodb exporter configuration | `any` | <pre>{<br>  "version": "2.9.0"<br>}</pre> | no |
 | <a name="input_mongodb_exporter_enabled"></a> [mongodb\_exporter\_enabled](#input\_mongodb\_exporter\_enabled) | Set true to deploy mongodb exporters to get metrics in grafana | `bool` | `false` | no |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | Enter namespace name | `string` | `"mongodb"` | no |

@@ -1973,7 +1973,7 @@ metrics:
     enabled: true
     ## @param metrics.serviceMonitor.namespace Namespace which Prometheus is running in
     ##
-    namespace: "monitoring"
+    namespace: ${namespace}
     ## @param metrics.serviceMonitor.interval Interval at which metrics should be scraped
     ##
     interval: 30s

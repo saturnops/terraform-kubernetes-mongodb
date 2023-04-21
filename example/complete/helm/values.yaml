@@ -1,4 +1,4 @@
-affinity: 
+affinity:
   nodeAffinity:
     requiredDuringSchedulingIgnoredDuringExecution:
         nodeSelectorTerms:

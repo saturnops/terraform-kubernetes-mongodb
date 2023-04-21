@@ -1,13 +1,13 @@
 variable "mongodb_config" {
   type = any
   default = {
-    name               = "skaf"
-    environment        = "dev"
-    volume_size        = "50Gi"
-    architecture       = "replicaset"
+    name               = ""
+    environment        = ""
+    volume_size        = ""
+    architecture       = ""
     replica_count      = 2
-    storage_class_name = "gp2"
     values_yaml        = ""
+    storage_class_name = ""
   }
   description = "Mongodb configurations"
 }
@@ -39,11 +39,9 @@ variable "mongodb_backup_enabled" {
 variable "mongodb_backup_config" {
   type = any
   default = {
-    s3_bucket_uri         = ""
-    aws_access_key_id     = ""
-    aws_secret_access_key = ""
-    s3_bucket_region      = "us-east-2"
-    cron_for_full_backup  = "*/5 * * * *"
+    s3_bucket_uri        = ""
+    s3_bucket_region     = "us-east-2"
+    cron_for_full_backup = "*/5 * * * *"
   }
   description = "Mongodb Backup configurations"
 }
@@ -75,7 +73,7 @@ variable "cluster_name" {
 }
 
 variable "create_namespace" {
-  type = string
+  type        = string
   description = "Set it to true to create given namespace"
-  default = true
+  default     = true
 }

@@ -3,8 +3,6 @@ backup:
   cron_for_full_backup: "${cron_for_full_backup}"
   bucket_uri: ${s3_bucket_uri}
   aws_default_region: ${s3_bucket_region}
-  aws_access_key_id : ${aws_access_key_id}
-  aws_secret_access_key: ${aws_secret_access_key}
 
 auth:
   rootUser: root
