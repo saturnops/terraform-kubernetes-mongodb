@@ -24,21 +24,15 @@ spec:
                 secretKeyRef:
                   name: mongo-restore
                   key: BUCKET_URI
-
             - name: FULL_RESTORE_ENABLED
-              value: {{ .Values.restore.full_restore_enable }}
-
+              value: {{ .Values.restore.full_restore_enable | quote }}
             - name: INCREMENTAL_RESTORE_ENABLED
-              value: {{ .Values.restore.incremental_restore_enable }}
-
+              value: {{ .Values.restore.incremental_restore_enable | quote }}
             - name: MONGO_BUCKET_RESTORE_FULL_FILE_URI
-              value: {{ .Values.restore.bucket_uri }}
-
+              value: {{ .Values.restore.bucket_uri | quote }}
             - name: FILE_NAME_FULL
-              value: {{ .Values.restore.file_name_full }}
-
+              value: {{ .Values.restore.file_name_full | quote }}
             - name: FILE_NAME_INCREMENTAL
-              value: {{ .Values.restore.file_name_incremental }}
-
+              value: {{ .Values.restore.file_name_incremental  | quote }}
       restartPolicy: Never
   backoffLimit: 4
