@@ -77,3 +77,24 @@ variable "create_namespace" {
   description = "Set it to true to create given namespace"
   default     = true
 }
+
+variable "mongodb_restore_enabled" {
+  type        = bool
+  default     = false
+  description = "Set true to enable mongodb restore"
+}
+
+variable "mongodb_restore_config" {
+  type = any
+  default = {
+    s3_bucket_uri        = "s3://mymongo/mongodumpfull_20230424_112501.gz"
+    s3_bucket_region     = "us-east-2"
+    full_restore_enable = false
+    file_name_full = ""
+    incremental_restore_enable = false
+    file_name_incremental = ""
+  }
+  description = "Mongodb restore configurations"
+}
+
+

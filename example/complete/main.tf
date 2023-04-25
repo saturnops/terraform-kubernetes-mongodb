@@ -24,4 +24,15 @@ module "mongodb" {
   }
   mongodb_backup_enabled   = true
   mongodb_exporter_enabled = false
+
+  mongodb_restore_enabled = true
+  mongodb_restore_config  = {
+    s3_bucket_uri        = "s3://mymongo/mongodumpfull_20230424_112501.gz"
+    s3_bucket_region     = "us-east-2"
+    full_restore_enable = true
+    file_name_full = "mongodumpfull_20230424_112501.gz"
+    incremental_restore_enable = false
+    file_name_incremental = ""
+  }
+
 }

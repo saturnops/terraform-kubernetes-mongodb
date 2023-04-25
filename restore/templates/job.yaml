@@ -1,0 +1,44 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: restore-mongo
+spec:
+  template:
+    spec:
+      serviceAccountName: sa-mongo-restore
+      containers:
+          - name: restore-mongodb
+            image: saturnops01/mongorestore:v2
+            env:
+            - name: MONGO_URI
+              value: mongodb://{{ .Values.auth.rootUser }}:{{ .Values.auth.rootPassword }}@mongodb-0.mongodb-headless.{{ .Release.Namespace }}.svc.cluster.local:27017
+            - name: MONGO_OPLOG
+              value: "false"
+            - name: AWS_DEFAULT_REGION
+              valueFrom:
+                secretKeyRef:
+                  name: aws-restore
+                  key: AWS_DEFAULT_REGION
+            - name: MONGO_BUCKET_RESTORE_URI
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-restore
+                  key: BUCKET_URI
+
+            - name: FULL_RESTORE_ENABLED
+              value: {{ .Values.restore.full_restore_enable }}
+
+            - name: INCREMENTAL_RESTORE_ENABLED
+              value: {{ .Values.restore.incremental_restore_enable }}
+
+            - name: MONGO_BUCKET_RESTORE_FULL_FILE_URI
+              value: {{ .Values.restore.bucket_uri }}
+
+            - name: FILE_NAME_FULL
+              value: {{ .Values.restore.file_name_full }}
+
+            - name: FILE_NAME_INCREMENTAL
+              value: {{ .Values.restore.file_name_incremental }}
+
+      restartPolicy: Never
+  backoffLimit: 4
