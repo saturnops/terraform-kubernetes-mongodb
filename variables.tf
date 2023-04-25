@@ -87,14 +87,12 @@ variable "mongodb_restore_enabled" {
 variable "mongodb_restore_config" {
   type = any
   default = {
-    s3_bucket_uri        = "s3://mymongo/mongodumpfull_20230424_112501.gz"
-    s3_bucket_region     = "us-east-2"
-    full_restore_enable = false
-    file_name_full = ""
+    s3_bucket_uri              = "s3://mymongo/mongodumpfull_20230424_112501.gz"
+    s3_bucket_region           = "us-east-2"
+    full_restore_enable        = false
+    file_name_full             = ""
     incremental_restore_enable = false
-    file_name_incremental = ""
+    file_name_incremental      = ""
   }
   description = "Mongodb restore configurations"
 }
-
-

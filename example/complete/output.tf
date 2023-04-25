@@ -1,6 +1,6 @@
-output "mongodb_port" {
-  value       = "27017"
-  description = "Mongodb Port"
+output "mongodb_configuration" {
+  value       = module.mongodb.mongodb
+  description = "Mongodb_Info"
 }
 
 output "mongodb_endpoint" {

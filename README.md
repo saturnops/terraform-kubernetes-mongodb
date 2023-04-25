@@ -67,11 +67,13 @@ No modules.
 | Name | Type |
 |------|------|
 | [aws_iam_role.mongo_backup_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
+| [aws_iam_role.mongo_restore_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_secretsmanager_secret.mongodb_user_password](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret) | resource |
 | [aws_secretsmanager_secret_version.mongodb_root_password](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_version) | resource |
 | [helm_release.mongodb](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [helm_release.mongodb_backup](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [helm_release.mongodb_exporter](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
+| [helm_release.mongodb_restore](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [kubernetes_namespace.mongodb](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/namespace) | resource |
 | [random_password.mongodb_exporter_password](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) | resource |
 | [random_password.mongodb_root_password](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) | resource |
@@ -91,6 +93,8 @@ No modules.
 | <a name="input_mongodb_config"></a> [mongodb\_config](#input\_mongodb\_config) | Mongodb configurations | `any` | <pre>{<br>  "architecture": "",<br>  "environment": "",<br>  "name": "",<br>  "replica_count": 2,<br>  "storage_class_name": "",<br>  "values_yaml": "",<br>  "volume_size": ""<br>}</pre> | no |
 | <a name="input_mongodb_exporter_config"></a> [mongodb\_exporter\_config](#input\_mongodb\_exporter\_config) | Mongodb exporter configuration | `any` | <pre>{<br>  "version": "2.9.0"<br>}</pre> | no |
 | <a name="input_mongodb_exporter_enabled"></a> [mongodb\_exporter\_enabled](#input\_mongodb\_exporter\_enabled) | Set true to deploy mongodb exporters to get metrics in grafana | `bool` | `false` | no |
+| <a name="input_mongodb_restore_config"></a> [mongodb\_restore\_config](#input\_mongodb\_restore\_config) | Mongodb restore configurations | `any` | <pre>{<br>  "file_name_full": "",<br>  "file_name_incremental": "",<br>  "full_restore_enable": false,<br>  "incremental_restore_enable": false,<br>  "s3_bucket_region": "us-east-2",<br>  "s3_bucket_uri": "s3://mymongo/mongodumpfull_20230424_112501.gz"<br>}</pre> | no |
+| <a name="input_mongodb_restore_enabled"></a> [mongodb\_restore\_enabled](#input\_mongodb\_restore\_enabled) | Set true to enable mongodb restore | `bool` | `false` | no |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | Enter namespace name | `string` | `"mongodb"` | no |
 | <a name="input_recovery_window_aws_secret"></a> [recovery\_window\_aws\_secret](#input\_recovery\_window\_aws\_secret) | Number of days that AWS Secrets Manager waits before it can delete the secret. This value can be 0 to force deletion without recovery or range from 7 to 30 days. | `number` | `0` | no |
 
@@ -98,8 +102,7 @@ No modules.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_mongodb_endpoint"></a> [mongodb\_endpoint](#output\_mongodb\_endpoint) | n/a |
-| <a name="output_mongodb_port"></a> [mongodb\_port](#output\_mongodb\_port) | Mongodb Port |
+| <a name="output_mongodb"></a> [mongodb](#output\_mongodb) | MongoDB\_Info |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 
 

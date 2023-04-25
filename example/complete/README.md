@@ -35,6 +35,6 @@ No inputs.
 
 | Name | Description |
 |------|-------------|
+| <a name="output_mongodb_configuration"></a> [mongodb\_configuration](#output\_mongodb\_configuration) | Mongodb\_Info |
 | <a name="output_mongodb_endpoint"></a> [mongodb\_endpoint](#output\_mongodb\_endpoint) | n/a |
-| <a name="output_mongodb_port"></a> [mongodb\_port](#output\_mongodb\_port) | Mongodb Port |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

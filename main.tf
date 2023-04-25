@@ -162,10 +162,10 @@ resource "helm_release" "mongodb_restore" {
       s3_bucket_uri              = var.mongodb_restore_config.s3_bucket_uri,
       s3_bucket_region           = var.mongodb_restore_config.s3_bucket_region,
       mongodb_root_user_password = random_password.mongodb_root_password.result,
-      full_restore_enable = var.mongodb_restore_config.full_restore_enable,
-      file_name_full = var.mongodb_restore_config.file_name_full,
+      full_restore_enable        = var.mongodb_restore_config.full_restore_enable,
+      file_name_full             = var.mongodb_restore_config.file_name_full,
       incremental_restore_enable = var.mongodb_restore_config.incremental_restore_enable,
-      file_name_incremental = var.mongodb_restore_config.file_name_incremental
+      file_name_incremental      = var.mongodb_restore_config.file_name_incremental
     })
   ]
 }
