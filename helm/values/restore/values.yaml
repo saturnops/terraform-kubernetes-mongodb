@@ -1,0 +1,15 @@
+## Full restore
+restore:
+  bucket_uri: ${s3_bucket_uri}
+  aws_default_region: ${s3_bucket_region}
+  full_restore_enable: ${full_restore_enable}
+  file_name_full: ${file_name_full}
+  incremental_restore_enable: ${incremental_restore_enable}
+  file_name_incremental: ${file_name_incremental}
+
+auth:
+  rootUser: root
+  rootPassword: "${mongodb_root_user_password}"
+
+s3:
+  role_arn: "${s3_role_arn}"
