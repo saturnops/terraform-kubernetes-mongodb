@@ -104,7 +104,7 @@ serviceMonitor:
   enabled: true
   interval: 30s
   scrapeTimeout: 10s
-  namespace: "monitoring"
+  namespace: "${service_monitor_namespace}"
   additionalLabels:
     release: prometheus-operator
   targetLabels: {}

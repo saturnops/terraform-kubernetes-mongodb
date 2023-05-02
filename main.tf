@@ -101,6 +101,7 @@ resource "helm_release" "mongodb_exporter" {
   values = [
     templatefile("${path.module}/helm/values/exporter/values.yaml", {
       mongodb_exporter_password = "${random_password.mongodb_exporter_password.result}"
+      service_monitor_namespace = var.namespace
     }),
     var.mongodb_config.values_yaml
   ]
