@@ -1,12 +1,16 @@
 locals {
+  name        = "mysql"
   region      = "us-east-2"
-  name        = "dev"
-  environment = "skaf"
-
+  environment = "prod"
+  additional_tags = {
+    Owner      = "organization_name"
+    Expires    = "Never"
+    Department = "Engineering"
+  }
 }
 
 module "mongodb" {
-  source       = "../../"
+  source       = "https://github.com/sq-ia/terraform-kubernetes-mongodb.git"
   cluster_name = "dev-skaf"
   mongodb_config = {
     name               = local.name

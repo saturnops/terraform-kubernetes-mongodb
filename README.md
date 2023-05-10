@@ -3,28 +3,46 @@
 
 
 <br>
+This module is for deploying a highly available MongoDB cluster on Kubernetes using Helm charts. This module provides flexible configuration options to customize the MongoDB deployment such as setting the volume size, architecture, replica count, and more. It also includes options to enable MongoDB backups and restores, and to deploy MongoDB exporters for getting metrics in Grafana. Additionally, this module provides options to create a new namespace, and to configure recovery windows for AWS Secrets Manager. With this module, users can easily deploy a highly available MongoDB cluster on Kubernetes with the flexibility to customize their configurations according to their needs.
+
+## Supported Versions:
+
+|  MongoDB Helm Chart Version    |     K8s supported version   |  
+| :-----:                       |         :---                |
+| **13.1.5**                     |    **1.23,1.24,1.25**           |
+
 
 ## Usage Example
 
 ```hcl
 module "mongodb" {
-  source                   = "../../"
+  source                   = "https://github.com/sq-ia/terraform-kubernetes-mongodb.git"
   cluster_name             = "dev-skaf"
   mongodb_config = {
   name               = "skaf"
-  values_yaml        = file("./helm/values.yaml")
+  values_yaml        = ""
   environment        = "prod"
   volume_size        = "10Gi"
   architecture       = "replicaset"
   replica_count      = 2
   storage_class_name = "gp2"  
   }
-  mongodb_backup_config = {
-    s3_bucket_uri         = "s3://bucket-name"
-    s3_bucket_region      = "us-east-2"
-    cron_for_full_backup  = "*/2 * * * *"
-  }
   mongodb_backup_enabled   = true
+  mongodb_backup_config = {
+    s3_bucket_uri         = ""
+    s3_bucket_region      = ""
+    cron_for_full_backup  = "* * * * *"
+  }
+
+  mongodb_restore_enabled = true
+  mongodb_restore_config = {
+    s3_bucket_uri              = ""
+    s3_bucket_region           = ""
+    full_restore_enable        = true
+    file_name_full             = ""
+    incremental_restore_enable = false
+    file_name_incremental      = ""
+  }
   mongodb_exporter_enabled = true  
 }
 
@@ -84,19 +102,19 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_app_version"></a> [app\_version](#input\_app\_version) | Enter app version of application | `string` | `"5.0.8-debian-10-r9"` | no |
-| <a name="input_chart_version"></a> [chart\_version](#input\_chart\_version) | Enter chart version of application | `string` | `"13.1.5"` | no |
-| <a name="input_cluster_name"></a> [cluster\_name](#input\_cluster\_name) | Name of the EKS cluster | `string` | `""` | no |
-| <a name="input_create_namespace"></a> [create\_namespace](#input\_create\_namespace) | Set it to true to create given namespace | `string` | `true` | no |
-| <a name="input_mongodb_backup_config"></a> [mongodb\_backup\_config](#input\_mongodb\_backup\_config) | Mongodb Backup configurations | `any` | <pre>{<br>  "cron_for_full_backup": "*/5 * * * *",<br>  "s3_bucket_region": "us-east-2",<br>  "s3_bucket_uri": ""<br>}</pre> | no |
-| <a name="input_mongodb_backup_enabled"></a> [mongodb\_backup\_enabled](#input\_mongodb\_backup\_enabled) | Set true to enable mongodb backups | `bool` | `false` | no |
-| <a name="input_mongodb_config"></a> [mongodb\_config](#input\_mongodb\_config) | Mongodb configurations | `any` | <pre>{<br>  "architecture": "",<br>  "environment": "",<br>  "name": "",<br>  "replica_count": 2,<br>  "storage_class_name": "",<br>  "values_yaml": "",<br>  "volume_size": ""<br>}</pre> | no |
+| <a name="input_app_version"></a> [app\_version](#input\_app\_version) | Version of the Mongodb application that will be deployed. | `string` | `"5.0.8-debian-10-r9"` | no |
+| <a name="input_chart_version"></a> [chart\_version](#input\_chart\_version) | Version of the Mongodb chart that will be used to deploy Mongodb application. | `string` | `"13.1.5"` | no |
+| <a name="input_cluster_name"></a> [cluster\_name](#input\_cluster\_name) | Specifies the name of the EKS cluster to deploy the Mongodb application on. | `string` | `""` | no |
+| <a name="input_create_namespace"></a> [create\_namespace](#input\_create\_namespace) | Specify whether or not to create the namespace if it does not already exist. Set it to true to create the namespace. | `string` | `true` | no |
+| <a name="input_mongodb_backup_config"></a> [mongodb\_backup\_config](#input\_mongodb\_backup\_config) | Configuration options for Mongodb database backups. It includes properties such as the S3 bucket URI, the S3 bucket region, and the cron expression for full backups. | `any` | <pre>{<br>  "cron_for_full_backup": "*/5 * * * *",<br>  "s3_bucket_region": "us-east-2",<br>  "s3_bucket_uri": ""<br>}</pre> | no |
+| <a name="input_mongodb_backup_enabled"></a> [mongodb\_backup\_enabled](#input\_mongodb\_backup\_enabled) | Specifies whether to enable backups for Mongodb database. | `bool` | `false` | no |
+| <a name="input_mongodb_config"></a> [mongodb\_config](#input\_mongodb\_config) | Specify the configuration settings for Mongodb, including the name, environment, storage options, replication settings, and custom YAML values. | `any` | <pre>{<br>  "architecture": "",<br>  "environment": "",<br>  "name": "",<br>  "replica_count": 2,<br>  "storage_class_name": "",<br>  "values_yaml": "",<br>  "volume_size": ""<br>}</pre> | no |
 | <a name="input_mongodb_exporter_config"></a> [mongodb\_exporter\_config](#input\_mongodb\_exporter\_config) | Mongodb exporter configuration | `any` | <pre>{<br>  "version": "2.9.0"<br>}</pre> | no |
-| <a name="input_mongodb_exporter_enabled"></a> [mongodb\_exporter\_enabled](#input\_mongodb\_exporter\_enabled) | Set true to deploy mongodb exporters to get metrics in grafana | `bool` | `false` | no |
-| <a name="input_mongodb_restore_config"></a> [mongodb\_restore\_config](#input\_mongodb\_restore\_config) | Mongodb restore configurations | `any` | <pre>{<br>  "file_name_full": "",<br>  "file_name_incremental": "",<br>  "full_restore_enable": false,<br>  "incremental_restore_enable": false,<br>  "s3_bucket_region": "us-east-2",<br>  "s3_bucket_uri": "s3://mymongo/mongodumpfull_20230424_112501.gz"<br>}</pre> | no |
-| <a name="input_mongodb_restore_enabled"></a> [mongodb\_restore\_enabled](#input\_mongodb\_restore\_enabled) | Set true to enable mongodb restore | `bool` | `false` | no |
-| <a name="input_namespace"></a> [namespace](#input\_namespace) | Enter namespace name | `string` | `"mongodb"` | no |
-| <a name="input_recovery_window_aws_secret"></a> [recovery\_window\_aws\_secret](#input\_recovery\_window\_aws\_secret) | Number of days that AWS Secrets Manager waits before it can delete the secret. This value can be 0 to force deletion without recovery or range from 7 to 30 days. | `number` | `0` | no |
+| <a name="input_mongodb_exporter_enabled"></a> [mongodb\_exporter\_enabled](#input\_mongodb\_exporter\_enabled) | Specify whether or not to deploy Mongodb exporter to collect Mysql metrics for monitoring in Grafana. | `bool` | `false` | no |
+| <a name="input_mongodb_restore_config"></a> [mongodb\_restore\_config](#input\_mongodb\_restore\_config) | Configuration options for restoring dump to the Mongodb database. | `any` | <pre>{<br>  "file_name_full": "",<br>  "file_name_incremental": "",<br>  "full_restore_enable": false,<br>  "incremental_restore_enable": false,<br>  "s3_bucket_region": "us-east-2",<br>  "s3_bucket_uri": "s3://mymongo/mongodumpfull_20230424_112501.gz"<br>}</pre> | no |
+| <a name="input_mongodb_restore_enabled"></a> [mongodb\_restore\_enabled](#input\_mongodb\_restore\_enabled) | Specifies whether to enable restoring dump to the Mongodb database. | `bool` | `false` | no |
+| <a name="input_namespace"></a> [namespace](#input\_namespace) | Name of the Kubernetes namespace where the Mongodb deployment will be deployed. | `string` | `"mongodb"` | no |
+| <a name="input_recovery_window_aws_secret"></a> [recovery\_window\_aws\_secret](#input\_recovery\_window\_aws\_secret) | Number of days that AWS Secrets Manager will wait before deleting a secret. This value can be set to 0 to force immediate deletion, or to a value between 7 and 30 days to allow for recovery. | `number` | `0` | no |
 
 ## Outputs
 

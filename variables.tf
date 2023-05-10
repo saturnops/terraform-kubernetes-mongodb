@@ -9,31 +9,31 @@ variable "mongodb_config" {
     values_yaml        = ""
     storage_class_name = ""
   }
-  description = "Mongodb configurations"
+  description = "Specify the configuration settings for Mongodb, including the name, environment, storage options, replication settings, and custom YAML values."
 }
 
 variable "chart_version" {
   type        = string
   default     = "13.1.5"
-  description = "Enter chart version of application"
+  description = "Version of the Mongodb chart that will be used to deploy Mongodb application."
 }
 
 variable "app_version" {
   type        = string
   default     = "5.0.8-debian-10-r9"
-  description = "Enter app version of application"
+  description = "Version of the Mongodb application that will be deployed."
 }
 
 variable "namespace" {
   type        = string
   default     = "mongodb"
-  description = "Enter namespace name"
+  description = "Name of the Kubernetes namespace where the Mongodb deployment will be deployed."
 }
 
 variable "mongodb_backup_enabled" {
   type        = bool
   default     = false
-  description = "Set true to enable mongodb backups"
+  description = "Specifies whether to enable backups for Mongodb database."
 }
 
 variable "mongodb_backup_config" {
@@ -43,13 +43,13 @@ variable "mongodb_backup_config" {
     s3_bucket_region     = "us-east-2"
     cron_for_full_backup = "*/5 * * * *"
   }
-  description = "Mongodb Backup configurations"
+  description = "Configuration options for Mongodb database backups. It includes properties such as the S3 bucket URI, the S3 bucket region, and the cron expression for full backups."
 }
 
 variable "mongodb_exporter_enabled" {
   type        = bool
   default     = false
-  description = "Set true to deploy mongodb exporters to get metrics in grafana"
+  description = "Specify whether or not to deploy Mongodb exporter to collect Mysql metrics for monitoring in Grafana."
 }
 
 variable "mongodb_exporter_config" {
@@ -63,25 +63,25 @@ variable "mongodb_exporter_config" {
 variable "recovery_window_aws_secret" {
   default     = 0
   type        = number
-  description = "Number of days that AWS Secrets Manager waits before it can delete the secret. This value can be 0 to force deletion without recovery or range from 7 to 30 days."
+  description = "Number of days that AWS Secrets Manager will wait before deleting a secret. This value can be set to 0 to force immediate deletion, or to a value between 7 and 30 days to allow for recovery."
 }
 
 variable "cluster_name" {
   type        = string
-  description = "Name of the EKS cluster"
+  description = "Specifies the name of the EKS cluster to deploy the Mongodb application on."
   default     = ""
 }
 
 variable "create_namespace" {
   type        = string
-  description = "Set it to true to create given namespace"
+  description = "Specify whether or not to create the namespace if it does not already exist. Set it to true to create the namespace."
   default     = true
 }
 
 variable "mongodb_restore_enabled" {
   type        = bool
   default     = false
-  description = "Set true to enable mongodb restore"
+  description = "Specifies whether to enable restoring dump to the Mongodb database."
 }
 
 variable "mongodb_restore_config" {
@@ -94,5 +94,5 @@ variable "mongodb_restore_config" {
     incremental_restore_enable = false
     file_name_incremental      = ""
   }
-  description = "Mongodb restore configurations"
+  description = "Configuration options for restoring dump to the Mongodb database."
 }
