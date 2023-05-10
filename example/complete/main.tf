@@ -11,7 +11,7 @@ locals {
 
 module "mongodb" {
   source       = "https://github.com/sq-ia/terraform-kubernetes-mongodb.git"
-  cluster_name = "dev-skaf"
+  cluster_name = "dev-cluster"
   mongodb_config = {
     name               = local.name
     values_yaml        = file("./helm/values.yaml")
@@ -21,14 +21,12 @@ module "mongodb" {
     replica_count      = 2
     storage_class_name = "gp2"
   }
+  mongodb_backup_enabled = true
   mongodb_backup_config = {
     s3_bucket_uri        = "s3://mymongo"
     s3_bucket_region     = local.region
     cron_for_full_backup = "*/2 * * * *"
   }
-  mongodb_backup_enabled   = true
-  mongodb_exporter_enabled = false
-
   mongodb_restore_enabled = true
   mongodb_restore_config = {
     s3_bucket_uri              = "s3://mymongo/mongodumpfull_20230424_112501.gz"
@@ -38,5 +36,5 @@ module "mongodb" {
     incremental_restore_enable = false
     file_name_incremental      = ""
   }
-
+  mongodb_exporter_enabled = true
 }

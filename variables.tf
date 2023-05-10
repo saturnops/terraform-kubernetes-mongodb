@@ -57,25 +57,25 @@ variable "mongodb_exporter_config" {
   default = {
     version = "2.9.0"
   }
-  description = "Mongodb exporter configuration"
+  description = "Specify whether or not to deploy Mongodb exporter to collect Mongodb metrics for monitoring in Grafana."
 }
 
 variable "recovery_window_aws_secret" {
-  default     = 0
   type        = number
+  default     = 0
   description = "Number of days that AWS Secrets Manager will wait before deleting a secret. This value can be set to 0 to force immediate deletion, or to a value between 7 and 30 days to allow for recovery."
 }
 
 variable "cluster_name" {
   type        = string
-  description = "Specifies the name of the EKS cluster to deploy the Mongodb application on."
   default     = ""
+  description = "Specifies the name of the EKS cluster to deploy the Mongodb application on."
 }
 
 variable "create_namespace" {
   type        = string
-  description = "Specify whether or not to create the namespace if it does not already exist. Set it to true to create the namespace."
   default     = true
+  description = "Specify whether or not to create the namespace if it does not already exist. Set it to true to create the namespace."
 }
 
 variable "mongodb_restore_enabled" {
