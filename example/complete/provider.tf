@@ -1,16 +1,17 @@
 provider "aws" {
   region = local.region
+  default_tags {
+    tags = local.additional_tags
+  }
 }
 
-
 data "aws_eks_cluster" "cluster" {
-  name = "test-saturnops"
+  name = ""
 }
 
 data "aws_eks_cluster_auth" "cluster" {
-  name = "test-saturnops"
+  name = ""
 }
-
 
 provider "kubernetes" {
   host                   = data.aws_eks_cluster.cluster.endpoint
