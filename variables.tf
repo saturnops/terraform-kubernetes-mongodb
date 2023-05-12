@@ -49,7 +49,7 @@ variable "mongodb_backup_config" {
 variable "mongodb_exporter_enabled" {
   type        = bool
   default     = false
-  description = "Specify whether or not to deploy Mongodb exporter to collect Mysql metrics for monitoring in Grafana."
+  description = "Specify whether or not to deploy Mongodb exporter to collect Mongodb metrics for monitoring in Grafana."
 }
 
 variable "mongodb_exporter_config" {
