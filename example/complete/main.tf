@@ -19,7 +19,7 @@ module "mongodb" {
     volume_size        = "10Gi"
     architecture       = "replicaset"
     replica_count      = 2
-    storage_class_name = "gp2"
+    storage_class_name = "gp3"
   }
   mongodb_backup_enabled = true
   mongodb_backup_config = {
