@@ -16,16 +16,16 @@ This module is for deploying a highly available MongoDB cluster on Kubernetes us
 
 ```hcl
 module "mongodb" {
-  source                   = "https://github.com/sq-ia/terraform-kubernetes-mongodb.git"
-  cluster_name             = "dev-skaf"
+  source                   = "saturnops/mongodb/kubernetes"
+  cluster_name             = "prod-cluster"
   mongodb_config = {
-  name               = "skaf"
+  name               = "mongo"
   values_yaml        = ""
   environment        = "prod"
   volume_size        = "10Gi"
   architecture       = "replicaset"
   replica_count      = 2
-  storage_class_name = "gp2"  
+  storage_class_name = "gp3"  
   }
   mongodb_backup_enabled   = true
   mongodb_backup_config = {
@@ -48,10 +48,10 @@ module "mongodb" {
 
 
 ```
-Refer [examples](https://github.com/sq-ia/terraform-kubernetes-mongodb/tree/main/examples/complete) for more details.
+Refer [examples](https://github.com/saturnops/terraform-kubernetes-mongodb/tree/main/examples/complete) for more details.
 
 ## IAM Permissions
-The required IAM permissions to create resources from this module can be found [here](https://github.com/sq-ia/terraform-kubernetes-mongodb/blob/main/IAM.md)
+The required IAM permissions to create resources from this module can be found [here](https://github.com/saturnops/terraform-kubernetes-mongodb/blob/main/IAM.md)
 
 ## Important Notes
   1. In order to enable the exporter, it is required to deploy Prometheus/Grafana first.
