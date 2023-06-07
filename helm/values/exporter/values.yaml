@@ -53,14 +53,6 @@ readinessProbe:
 replicas: 1
 
 affinity: {}
-  # nodeAffinity:
-  #   requiredDuringSchedulingIgnoredDuringExecution:
-  #     nodeSelectorTerms:
-  #     - matchExpressions:
-  #       - key: "App-On-Demand"
-  #         operator: In
-  #         values:
-  #         - "true"
 
 resources:
   limits:

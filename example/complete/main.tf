@@ -30,7 +30,7 @@ module "mongodb" {
   mongodb_restore_enabled = true
   mongodb_restore_config = {
     s3_bucket_uri              = "s3://bucket_name/filename"
-    s3_bucket_region           = "bucker_region"
+    s3_bucket_region           = "bucket_region"
     full_restore_enable        = true
     file_name_full             = "filename"
     incremental_restore_enable = false
