@@ -8,31 +8,22 @@ spec:
       serviceAccountName: sa-mongo-restore
       containers:
           - name: restore-mongodb
-            image: saturnops/mongodb-restore:v2
+            image: saturnops/mongodb-restore:v3
             env:
             - name: MONGO_URI
               value: mongodb://{{ .Values.auth.rootUser }}:{{ .Values.auth.rootPassword }}@mongodb-0.mongodb-headless.{{ .Release.Namespace }}.svc.cluster.local:27017
             - name: MONGO_OPLOG
               value: "false"
             - name: AWS_DEFAULT_REGION
-              valueFrom:
-                secretKeyRef:
-                  name: aws-restore
-                  key: AWS_DEFAULT_REGION
+              value: {{ .Values.restore.aws_default_region}}
             - name: MONGO_BUCKET_RESTORE_URI
               valueFrom:
                 secretKeyRef:
                   name: mongo-restore
                   key: BUCKET_URI
-            - name: FULL_RESTORE_ENABLED
-              value: {{ .Values.restore.full_restore_enable | quote }}
-            - name: INCREMENTAL_RESTORE_ENABLED
-              value: {{ .Values.restore.incremental_restore_enable | quote }}
-            - name: MONGO_BUCKET_RESTORE_FULL_FILE_URI
-              value: {{ .Values.restore.bucket_uri | quote }}
             - name: FILE_NAME_FULL
-              value: {{ .Values.restore.file_name_full | quote }}
-            - name: FILE_NAME_INCREMENTAL
-              value: {{ .Values.restore.file_name_incremental  | quote }}
+              value: {{ .Values.restore.file_name | quote }}
+            - name: RESTORE_FROM
+              value: {{ .Values.bucket_provider_type}}
       restartPolicy: Never
   backoffLimit: 4

@@ -1,12 +1,14 @@
-## Full backup
-backup:
-  cron_for_full_backup: "${cron_for_full_backup}"
-  bucket_uri: ${s3_bucket_uri}
-  aws_default_region: ${s3_bucket_region}
-
+## Enable Full backup
 auth:
   rootUser: root
   rootPassword: "${mongodb_root_user_password}"
 
-s3:
-  role_arn: "${s3_role_arn}"
+backup:
+  bucket_uri: ${bucket_uri}
+  aws_default_region: ${s3_bucket_region}
+  cron_for_full_backup: "${cron_for_full_backup}"
+
+annotations:
+  ${annotations}
+
+bucket_provider_type: ${bucket_provider_type}

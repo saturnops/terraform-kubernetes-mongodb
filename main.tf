@@ -1,17 +1,7 @@
 locals {
   arbiterValue = var.mongodb_config.replica_count % 2 == 0 ? true : false
-  oidc_provider = replace(
-    data.aws_eks_cluster.kubernetes_cluster.identity[0].oidc[0].issuer,
-    "/^https:///",
-    ""
-  )
 }
 
-data "aws_caller_identity" "current" {}
-
-data "aws_eks_cluster" "kubernetes_cluster" {
-  name = var.cluster_name
-}
 resource "random_password" "mongodb_root_password" {
   length  = 20
   special = false
@@ -20,23 +10,6 @@ resource "random_password" "mongodb_root_password" {
 resource "random_password" "mongodb_exporter_password" {
   length  = 20
   special = false
-}
-
-resource "aws_secretsmanager_secret" "mongodb_user_password" {
-  name                    = format("%s/%s/%s", var.mongodb_config.environment, var.mongodb_config.name, "mongodb")
-  recovery_window_in_days = var.recovery_window_aws_secret
-}
-
-resource "aws_secretsmanager_secret_version" "mongodb_root_password" {
-  secret_id     = aws_secretsmanager_secret.mongodb_user_password.id
-  secret_string = <<EOF
-   {
-    "root_user": "root",
-    "root_password": "${random_password.mongodb_root_password.result}",
-    "metric_exporter_user": "mongodb_exporter",
-    "metric_exporter_password": "${random_password.mongodb_exporter_password.result}"
-   }
-EOF
 }
 
 resource "kubernetes_namespace" "mongodb" {
@@ -71,6 +44,26 @@ resource "helm_release" "mongodb" {
   ]
 }
 
+module "aws" {
+  source                     = "./provider/aws"
+  count                      = var.bucket_provider_type == "s3" ? 1 : 0
+  mongodb_config             = var.mongodb_config
+  recovery_window_aws_secret = var.recovery_window_aws_secret
+  cluster_name               = var.cluster_name
+  root_password              = random_password.mongodb_root_password.result
+  metric_exporter_pasword    = random_password.mongodb_exporter_password.result
+}
+
+module "gcp" {
+  source                  = "./provider/gcp"
+  count                   = var.bucket_provider_type == "gcs" ? 1 : 0
+  project_id              = var.project_id
+  environment             = var.mongodb_config.environment
+  mongodb_config          = var.mongodb_config
+  root_password           = random_password.mongodb_root_password.result
+  metric_exporter_pasword = random_password.mongodb_exporter_password.result
+}
+
 resource "helm_release" "mongodb_backup" {
   depends_on = [helm_release.mongodb]
   count      = var.mongodb_backup_enabled ? 1 : 0
@@ -80,11 +73,32 @@ resource "helm_release" "mongodb_backup" {
   namespace  = var.namespace
   values = [
     templatefile("${path.module}/helm/values/backup/values.yaml", {
-      s3_role_arn                = aws_iam_role.mongo_backup_role.arn,
-      s3_bucket_uri              = var.mongodb_backup_config.s3_bucket_uri,
-      s3_bucket_region           = var.mongodb_backup_config.s3_bucket_region,
+      mongodb_root_user_password = random_password.mongodb_root_password.result,
+      bucket_uri                 = var.mongodb_backup_config.bucket_uri,
+      s3_bucket_region           = var.bucket_provider_type == "s3" ? var.mongodb_backup_config.s3_bucket_region : "",
       cron_for_full_backup       = var.mongodb_backup_config.cron_for_full_backup,
-      mongodb_root_user_password = random_password.mongodb_root_password.result
+      bucket_provider_type       = var.bucket_provider_type,
+      annotations                = var.bucket_provider_type == "s3" ? "eks.amazonaws.com/role-arn: ${module.aws[0].iam_role_arn_backup}" : "iam.gke.io/gcp-service-account: ${module.gcp[0].service_account_backup}"
+    })
+  ]
+}
+
+##DB Dump restore
+resource "helm_release" "mongodb_restore" {
+  depends_on = [helm_release.mongodb]
+  count      = var.mongodb_restore_enabled ? 1 : 0
+  name       = "mongodb-restore"
+  chart      = "${path.module}/restore"
+  timeout    = 600
+  namespace  = var.namespace
+  values = [
+    templatefile("${path.module}/helm/values/restore/values.yaml", {
+      mongodb_root_user_password = random_password.mongodb_root_password.result,
+      bucket_uri                 = var.mongodb_restore_config.bucket_uri,
+      file_name                  = var.mongodb_restore_config.file_name,
+      s3_bucket_region           = var.bucket_provider_type == "s3" ? var.mongodb_restore_config.s3_bucket_region : "",
+      bucket_provider_type       = var.bucket_provider_type,
+      annotations                = var.bucket_provider_type == "s3" ? "eks.amazonaws.com/role-arn: ${module.aws[0].iam_role_arn_restore}" : "iam.gke.io/gcp-service-account: ${module.gcp[0].service_account_restore}"
     })
   ]
 }
@@ -105,110 +119,4 @@ resource "helm_release" "mongodb_exporter" {
     }),
     var.mongodb_config.values_yaml
   ]
-}
-
-resource "aws_iam_role" "mongo_backup_role" {
-  name = format("%s-%s-%s", var.cluster_name, var.mongodb_config.name, "mongodb-backup")
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect = "Allow",
-        Principal = {
-          Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${local.oidc_provider}"
-        },
-        Action = "sts:AssumeRoleWithWebIdentity",
-        Condition = {
-          StringEquals = {
-            "${local.oidc_provider}:aud" = "sts.amazonaws.com",
-            "${local.oidc_provider}:sub" = "system:serviceaccount:${var.namespace}:sa-mongo-backup"
-          }
-        }
-      }
-    ]
-  })
-  inline_policy {
-    name = "AllowS3PutObject"
-    policy = jsonencode({
-      Version = "2012-10-17"
-      Statement = [
-        {
-          Action = [
-            "s3:ListBucket",
-            "s3:GetObject",
-            "s3:PutObject",
-            "s3:DeleteObject",
-            "s3:AbortMultipartUpload",
-            "s3:ListMultipartUploadParts"
-          ]
-          Effect   = "Allow"
-          Resource = "*"
-        }
-      ]
-    })
-  }
-}
-
-##DB Dump restore
-resource "helm_release" "mongodb_restore" {
-  depends_on = [helm_release.mongodb]
-  count      = var.mongodb_restore_enabled ? 1 : 0
-  name       = "mongodb-restore"
-  chart      = "${path.module}/restore"
-  timeout    = 600
-  namespace  = var.namespace
-  values = [
-    templatefile("${path.module}/helm/values/restore/values.yaml", {
-      s3_role_arn                = aws_iam_role.mongo_restore_role.arn,
-      s3_bucket_uri              = var.mongodb_restore_config.s3_bucket_uri,
-      s3_bucket_region           = var.mongodb_restore_config.s3_bucket_region,
-      file_name_full             = var.mongodb_restore_config.file_name_full,
-      full_restore_enable        = var.mongodb_restore_config.full_restore_enable,
-      file_name_incremental      = var.mongodb_restore_config.file_name_incremental,
-      incremental_restore_enable = var.mongodb_restore_config.incremental_restore_enable,
-      mongodb_root_user_password = random_password.mongodb_root_password.result
-    })
-  ]
-}
-
-resource "aws_iam_role" "mongo_restore_role" {
-  name = format("%s-%s-%s", var.cluster_name, var.mongodb_config.name, "mongodb-restore")
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect = "Allow",
-        Principal = {
-          Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${local.oidc_provider}"
-        },
-        Action = "sts:AssumeRoleWithWebIdentity",
-        Condition = {
-          StringEquals = {
-            "${local.oidc_provider}:aud" = "sts.amazonaws.com",
-            "${local.oidc_provider}:sub" = "system:serviceaccount:${var.namespace}:sa-mongo-restore"
-          }
-        }
-      }
-    ]
-  })
-  inline_policy {
-    name = "AllowS3PutObject"
-    policy = jsonencode({
-      Version = "2012-10-17"
-      Statement = [
-        {
-          Action = [
-            "s3:ListBucket",
-            "s3:GetObject",
-            "s3:PutObject",
-            "s3:DeleteObject",
-            "s3:AbortMultipartUpload",
-            "s3:ListMultipartUploadParts"
-          ]
-          Effect   = "Allow"
-          Resource = "*"
-        }
-      ]
-    })
-  }
 }
