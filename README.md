@@ -19,13 +19,14 @@ module "mongodb" {
   source                   = "saturnops/mongodb/kubernetes"
   cluster_name             = "prod-cluster"
   mongodb_config = {
-  name               = "mongo"
-  values_yaml        = ""
-  environment        = "prod"
-  volume_size        = "10Gi"
-  architecture       = "replicaset"
-  replica_count      = 2
-  storage_class_name = "gp3"  
+  name                             = "mongo"
+  values_yaml                      = ""
+  environment                      = "prod"
+  volume_size                      = "10Gi"
+  architecture                     = "replicaset"
+  replica_count                    = 2
+  storage_class_name               = "gp3" 
+  store_password_to_secret_manager = true 
   }
   mongodb_backup_enabled   = true
   mongodb_backup_config = {

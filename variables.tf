@@ -1,13 +1,14 @@
 variable "mongodb_config" {
   type = any
   default = {
-    name               = ""
-    environment        = ""
-    volume_size        = ""
-    architecture       = ""
-    replica_count      = 2
-    values_yaml        = ""
-    storage_class_name = ""
+    name                             = ""
+    environment                      = ""
+    volume_size                      = ""
+    architecture                     = ""
+    replica_count                    = 2
+    values_yaml                      = ""
+    storage_class_name               = ""
+    store_password_to_secret_manager = true
   }
   description = "Specify the configuration settings for Mongodb, including the name, environment, storage options, replication settings, and custom YAML values."
 }

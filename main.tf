@@ -23,12 +23,14 @@ resource "random_password" "mongodb_exporter_password" {
 }
 
 resource "aws_secretsmanager_secret" "mongodb_user_password" {
+  count                   = var.mongodb_config.store_password_to_secret_manager ? 1 : 0
   name                    = format("%s/%s/%s", var.mongodb_config.environment, var.mongodb_config.name, "mongodb")
   recovery_window_in_days = var.recovery_window_aws_secret
 }
 
 resource "aws_secretsmanager_secret_version" "mongodb_root_password" {
-  secret_id     = aws_secretsmanager_secret.mongodb_user_password.id
+  count         = var.mongodb_config.store_password_to_secret_manager ? 1 : 0
+  secret_id     = aws_secretsmanager_secret.mongodb_user_password[0].id
   secret_string = <<EOF
    {
     "root_user": "root",
