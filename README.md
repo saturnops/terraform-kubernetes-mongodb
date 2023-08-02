@@ -25,8 +25,8 @@ module "mongodb" {
   volume_size                      = "10Gi"
   architecture                     = "replicaset"
   replica_count                    = 2
-  storage_class_name               = "gp3" 
-  store_password_to_secret_manager = true 
+  storage_class_name               = "gp3"
+  store_password_to_secret_manager = true
   }
   mongodb_backup_enabled   = true
   mongodb_backup_config = {
@@ -109,7 +109,7 @@ No modules.
 | <a name="input_create_namespace"></a> [create\_namespace](#input\_create\_namespace) | Specify whether or not to create the namespace if it does not already exist. Set it to true to create the namespace. | `string` | `true` | no |
 | <a name="input_mongodb_backup_config"></a> [mongodb\_backup\_config](#input\_mongodb\_backup\_config) | Configuration options for Mongodb database backups. It includes properties such as the S3 bucket URI, the S3 bucket region, and the cron expression for full backups. | `any` | <pre>{<br>  "cron_for_full_backup": "*/5 * * * *",<br>  "s3_bucket_region": "us-east-2",<br>  "s3_bucket_uri": ""<br>}</pre> | no |
 | <a name="input_mongodb_backup_enabled"></a> [mongodb\_backup\_enabled](#input\_mongodb\_backup\_enabled) | Specifies whether to enable backups for Mongodb database. | `bool` | `false` | no |
-| <a name="input_mongodb_config"></a> [mongodb\_config](#input\_mongodb\_config) | Specify the configuration settings for Mongodb, including the name, environment, storage options, replication settings, and custom YAML values. | `any` | <pre>{<br>  "architecture": "",<br>  "environment": "",<br>  "name": "",<br>  "replica_count": 2,<br>  "storage_class_name": "",<br>  "values_yaml": "",<br>  "volume_size": ""<br>}</pre> | no |
+| <a name="input_mongodb_config"></a> [mongodb\_config](#input\_mongodb\_config) | Specify the configuration settings for Mongodb, including the name, environment, storage options, replication settings, and custom YAML values. | `any` | <pre>{<br>  "architecture": "",<br>  "environment": "",<br>  "name": "",<br>  "replica_count": 2,<br>  "storage_class_name": "",<br>  "store_password_to_secret_manager": true,<br>  "values_yaml": "",<br>  "volume_size": ""<br>}</pre> | no |
 | <a name="input_mongodb_exporter_config"></a> [mongodb\_exporter\_config](#input\_mongodb\_exporter\_config) | Specify whether or not to deploy Mongodb exporter to collect Mongodb metrics for monitoring in Grafana. | `any` | <pre>{<br>  "version": "2.9.0"<br>}</pre> | no |
 | <a name="input_mongodb_exporter_enabled"></a> [mongodb\_exporter\_enabled](#input\_mongodb\_exporter\_enabled) | Specify whether or not to deploy Mongodb exporter to collect Mongodb metrics for monitoring in Grafana. | `bool` | `false` | no |
 | <a name="input_mongodb_restore_config"></a> [mongodb\_restore\_config](#input\_mongodb\_restore\_config) | Configuration options for restoring dump to the Mongodb database. | `any` | <pre>{<br>  "file_name_full": "",<br>  "file_name_incremental": "",<br>  "full_restore_enable": false,<br>  "incremental_restore_enable": false,<br>  "s3_bucket_region": "us-east-2",<br>  "s3_bucket_uri": "s3://mymongo/mongodumpfull_20230424_112501.gz"<br>}</pre> | no |
@@ -121,7 +121,8 @@ No modules.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_mongodb"></a> [mongodb](#output\_mongodb) | MongoDB\_Info |
+| <a name="output_mongodb_credential"></a> [mongodb\_credential](#output\_mongodb\_credential) | MongoDB\_Info |
+| <a name="output_mongodb_endpoints"></a> [mongodb\_endpoints](#output\_mongodb\_endpoints) | MongoDB\_Info |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 
 
