@@ -7,19 +7,28 @@ locals {
     Expires    = "Never"
     Department = "Engineering"
   }
+  store_password_to_secret_manager = true
 }
 
 module "mongodb" {
   source       = "saturnops/mongodb/kubernetes"
   cluster_name = "dev-cluster"
   mongodb_config = {
-    name               = local.name
-    values_yaml        = file("./helm/values.yaml")
-    environment        = local.environment
-    volume_size        = "10Gi"
-    architecture       = "replicaset"
-    replica_count      = 2
-    storage_class_name = "gp3"
+    name                             = local.name
+    values_yaml                      = file("./helm/values.yaml")
+    environment                      = local.environment
+    volume_size                      = "10Gi"
+    architecture                     = "replicaset"
+    replica_count                    = 2
+    storage_class_name               = "gp3"
+    store_password_to_secret_manager = local.store_password_to_secret_manager
+  }
+  mongodb_custom_credentials_enabled = true
+  mongodb_custom_credentials_config = {
+    root_user                = "root"
+    root_password            = "NCPFUKEMd7rrWuvMAa73"
+    metric_exporter_user     = "mongodb_exporter"
+    metric_exporter_password = "nvAHhm1uGQNYWVw6ZyAH"
   }
   mongodb_backup_enabled = true
   mongodb_backup_config = {
