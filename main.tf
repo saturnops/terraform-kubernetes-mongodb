@@ -13,11 +13,13 @@ data "aws_eks_cluster" "kubernetes_cluster" {
   name = var.cluster_name
 }
 resource "random_password" "mongodb_root_password" {
+  count   = var.mongodb_custom_credentials_enabled ? 0 : 1
   length  = 20
   special = false
 }
 
 resource "random_password" "mongodb_exporter_password" {
+  count   = var.mongodb_custom_credentials_enabled ? 0 : 1
   length  = 20
   special = false
 }
@@ -29,16 +31,21 @@ resource "aws_secretsmanager_secret" "mongodb_user_password" {
 }
 
 resource "aws_secretsmanager_secret_version" "mongodb_root_password" {
-  count         = var.mongodb_config.store_password_to_secret_manager ? 1 : 0
-  secret_id     = aws_secretsmanager_secret.mongodb_user_password[0].id
-  secret_string = <<EOF
-   {
-    "root_user": "root",
-    "root_password": "${random_password.mongodb_root_password.result}",
-    "metric_exporter_user": "mongodb_exporter",
-    "metric_exporter_password": "${random_password.mongodb_exporter_password.result}"
-   }
-EOF
+  count     = var.mongodb_config.store_password_to_secret_manager ? 1 : 0
+  secret_id = aws_secretsmanager_secret.mongodb_user_password[0].id
+  secret_string = var.mongodb_custom_credentials_enabled ? jsonencode(
+    {
+      "root_user" : "${var.mongodb_custom_credentials_config.root_user}",
+      "root_password" : "${var.mongodb_custom_credentials_config.root_password}",
+      "metric_exporter_user" : "${var.mongodb_custom_credentials_config.metric_exporter_user}",
+      "metric_exporter_password" : "${var.mongodb_custom_credentials_config.metric_exporter_password}"
+    }) : jsonencode(
+    {
+      "root_user" : "root",
+      "root_password" : "${random_password.mongodb_root_password[0].result}",
+      "metric_exporter_user" : "mongodb_exporter",
+      "metric_exporter_password" : "${random_password.mongodb_exporter_password[0].result}"
+  })
 }
 
 resource "kubernetes_namespace" "mongodb" {
@@ -66,8 +73,8 @@ resource "helm_release" "mongodb" {
       replicacount               = var.mongodb_config.replica_count,
       arbiterValue               = local.arbiterValue,
       storage_class_name         = var.mongodb_config.storage_class_name,
-      mongodb_exporter_password  = random_password.mongodb_exporter_password.result,
-      mongodb_root_user_password = random_password.mongodb_root_password.result
+      mongodb_exporter_password  = var.mongodb_custom_credentials_enabled ? var.mongodb_custom_credentials_config.metric_exporter_password : random_password.mongodb_exporter_password[0].result,
+      mongodb_root_user_password = var.mongodb_custom_credentials_enabled ? var.mongodb_custom_credentials_config.root_password : random_password.mongodb_root_password[0].result
     }),
     var.mongodb_config.values_yaml
   ]
@@ -86,7 +93,7 @@ resource "helm_release" "mongodb_backup" {
       s3_bucket_uri              = var.mongodb_backup_config.s3_bucket_uri,
       s3_bucket_region           = var.mongodb_backup_config.s3_bucket_region,
       cron_for_full_backup       = var.mongodb_backup_config.cron_for_full_backup,
-      mongodb_root_user_password = random_password.mongodb_root_password.result
+      mongodb_root_user_password = var.mongodb_custom_credentials_enabled ? var.mongodb_custom_credentials_config.root_password : random_password.mongodb_root_password[0].result
     })
   ]
 }
@@ -102,7 +109,7 @@ resource "helm_release" "mongodb_exporter" {
   repository = "https://prometheus-community.github.io/helm-charts"
   values = [
     templatefile("${path.module}/helm/values/exporter/values.yaml", {
-      mongodb_exporter_password = "${random_password.mongodb_exporter_password.result}"
+      mongodb_exporter_password = var.mongodb_custom_credentials_enabled ? var.mongodb_custom_credentials_config.metric_exporter_password : "${random_password.mongodb_exporter_password[0].result}"
       service_monitor_namespace = var.namespace
     }),
     var.mongodb_config.values_yaml
@@ -168,7 +175,7 @@ resource "helm_release" "mongodb_restore" {
       full_restore_enable        = var.mongodb_restore_config.full_restore_enable,
       file_name_incremental      = var.mongodb_restore_config.file_name_incremental,
       incremental_restore_enable = var.mongodb_restore_config.incremental_restore_enable,
-      mongodb_root_user_password = random_password.mongodb_root_password.result
+      mongodb_root_user_password = var.mongodb_custom_credentials_enabled ? var.mongodb_custom_credentials_config.root_password : random_password.mongodb_root_password[0].result
     })
   ]
 }

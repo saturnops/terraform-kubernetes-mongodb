@@ -9,7 +9,7 @@ This module is for deploying a highly available MongoDB cluster on Kubernetes us
 
 |  MongoDB Helm Chart Version    |     K8s supported version   |  
 | :-----:                       |         :---                |
-| **13.1.5**                     |    **1.23,1.24,1.25**           |
+| **13.1.5**                     |    **1.23,1.24,1.25,1.26,1.27**           |
 
 
 ## Usage Example
@@ -27,6 +27,13 @@ module "mongodb" {
   replica_count                    = 2
   storage_class_name               = "gp3"
   store_password_to_secret_manager = true
+  }
+  mongodb_custom_credentials_enabled = true
+  mongodb_custom_credentials_config = {
+    root_user                = "root"
+    root_password            = "NCPFUKEMd7rrWuvMAa73"
+    metric_exporter_user     = "mongodb_exporter"
+    metric_exporter_password = "nvAHhm1uGQNYWVw6ZyAH"
   }
   mongodb_backup_enabled   = true
   mongodb_backup_config = {

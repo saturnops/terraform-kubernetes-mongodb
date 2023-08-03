@@ -23,6 +23,13 @@ module "mongodb" {
     storage_class_name               = "gp3"
     store_password_to_secret_manager = local.store_password_to_secret_manager
   }
+  mongodb_custom_credentials_enabled = true
+  mongodb_custom_credentials_config = {
+    root_user                = "root"
+    root_password            = "NCPFUKEMd7rrWuvMAa73"
+    metric_exporter_user     = "mongodb_exporter"
+    metric_exporter_password = "nvAHhm1uGQNYWVw6ZyAH"
+  }
   mongodb_backup_enabled = true
   mongodb_backup_config = {
     s3_bucket_uri        = "s3://bucket_name"
