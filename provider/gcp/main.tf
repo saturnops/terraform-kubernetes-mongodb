@@ -1,4 +1,5 @@
 resource "google_secret_manager_secret" "mongo-secret" {
+  count     = var.mongodb_config.store_password_to_secret_manager ? 1 : 0
   project   = var.project_id
   secret_id = format("%s-%s-%s", var.mongodb_config.environment, var.mongodb_config.name, "mongo")
 
@@ -8,15 +9,21 @@ resource "google_secret_manager_secret" "mongo-secret" {
 }
 
 resource "google_secret_manager_secret_version" "mongo-secret" {
-  secret      = google_secret_manager_secret.mongo-secret.id
-  secret_data = <<EOF
-   {
-    "root_user": "root",
-    "root_password": "${var.root_password}",
-    "metric_exporter_user": "mongodb_exporter",
-    "metric_exporter_password": "${var.metric_exporter_pasword}"
-   }
-EOF
+  count  = var.mongodb_config.store_password_to_secret_manager ? 1 : 0
+  secret = google_secret_manager_secret.mongo-secret[0].id
+  secret_data = var.mongodb_custom_credentials_enabled ? jsonencode(
+    {
+      "root_user" : "${var.mongodb_custom_credentials_config.root_user}",
+      "root_password" : "${var.mongodb_custom_credentials_config.root_password}",
+      "metric_exporter_user" : "${var.mongodb_custom_credentials_config.metric_exporter_user}",
+      "metric_exporter_password" : "${var.mongodb_custom_credentials_config.metric_exporter_password}"
+    }) : jsonencode(
+    {
+      "root_user" : "root",
+      "root_password" : "${random_password.mongodb_root_password[0].result}",
+      "metric_exporter_user" : "mongodb_exporter",
+      "metric_exporter_password" : "${random_password.mongodb_exporter_password[0].result}"
+  })
 }
 
 resource "google_service_account" "mongo_backup" {

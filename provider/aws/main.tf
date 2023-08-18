@@ -14,20 +14,27 @@ data "aws_eks_cluster" "kubernetes_cluster" {
 
 
 resource "aws_secretsmanager_secret" "mongodb_user_password" {
+  count                   = var.mongodb_config.store_password_to_secret_manager ? 1 : 0
   name                    = format("%s/%s/%s", var.mongodb_config.environment, var.mongodb_config.name, "mongodb")
   recovery_window_in_days = var.recovery_window_aws_secret
 }
 
 resource "aws_secretsmanager_secret_version" "mongodb_root_password" {
-  secret_id     = aws_secretsmanager_secret.mongodb_user_password.id
-  secret_string = <<EOF
-   {
-    "root_user": "root",
-    "root_password": "${var.root_password}",
-    "metric_exporter_user": "mongodb_exporter",
-    "metric_exporter_password": "${var.metric_exporter_pasword}"
-   }
-EOF
+  count     = var.mongodb_config.store_password_to_secret_manager ? 1 : 0
+  secret_id = aws_secretsmanager_secret.mongodb_user_password[0].id
+  secret_string = var.mongodb_custom_credentials_enabled ? jsonencode(
+    {
+      "root_user" : "${var.mongodb_custom_credentials_config.root_user}",
+      "root_password" : "${var.mongodb_custom_credentials_config.root_password}",
+      "metric_exporter_user" : "${var.mongodb_custom_credentials_config.metric_exporter_user}",
+      "metric_exporter_password" : "${var.mongodb_custom_credentials_config.metric_exporter_password}"
+    }) : jsonencode(
+    {
+      "root_user" : "root",
+      "root_password" : "${random_password.mongodb_root_password[0].result}",
+      "metric_exporter_user" : "mongodb_exporter",
+      "metric_exporter_password" : "${random_password.mongodb_exporter_password[0].result}"
+  })
 }
 
 resource "aws_iam_role" "mongo_backup_role" {

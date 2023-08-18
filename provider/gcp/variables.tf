@@ -47,13 +47,31 @@ variable "metric_exporter_pasword" {
 variable "mongodb_config" {
   type = any
   default = {
-    name               = ""
-    environment        = ""
-    volume_size        = ""
-    architecture       = ""
-    replica_count      = 2
-    values_yaml        = ""
-    storage_class_name = ""
+    name                             = ""
+    environment                      = ""
+    volume_size                      = ""
+    architecture                     = ""
+    replica_count                    = 2
+    values_yaml                      = ""
+    storage_class_name               = ""
+    store_password_to_secret_manager = true
   }
   description = "Specify the configuration settings for Mongodb, including the name, environment, storage options, replication settings, and custom YAML values."
+}
+
+variable "mongodb_custom_credentials_enabled" {
+  type        = bool
+  default     = false
+  description = "Specifies whether to enable custom credentials for MongoDB database."
+}
+
+variable "mongodb_custom_credentials_config" {
+  type = any
+  default = {
+    root_user                = ""
+    root_password            = ""
+    metric_exporter_user     = ""
+    metric_exporter_password = ""
+  }
+  description = "Specify the configuration settings for Mongodb to pass custom credentials during creation."
 }

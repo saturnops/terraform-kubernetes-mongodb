@@ -7,6 +7,7 @@ locals {
     Expires    = "Never"
     Department = "Engineering"
   }
+  store_password_to_secret_manager = true
 }
 
 module "mongodb" {
@@ -14,13 +15,21 @@ module "mongodb" {
   cluster_name = "dev-cluster"
   project_id   = "" #for gcp
   mongodb_config = {
-    name               = local.name
-    values_yaml        = file("./helm/values.yaml")
-    environment        = local.environment
-    volume_size        = "10Gi"
-    architecture       = "replicaset"
-    replica_count      = 2
-    storage_class_name = "standard"
+    name                             = local.name
+    values_yaml                      = file("./helm/values.yaml")
+    environment                      = local.environment
+    volume_size                      = "10Gi"
+    architecture                     = "replicaset"
+    replica_count                    = 2
+    storage_class_name               = "gp3"
+    store_password_to_secret_manager = local.store_password_to_secret_manager
+  }
+  mongodb_custom_credentials_enabled = true
+  mongodb_custom_credentials_config = {
+    root_user                = "root"
+    root_password            = "NCPFUKEMd7rrWuvMAa73"
+    metric_exporter_user     = "mongodb_exporter"
+    metric_exporter_password = "nvAHhm1uGQNYWVw6ZyAH"
   }
   bucket_provider_type   = "gcs"
   mongodb_backup_enabled = true

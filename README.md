@@ -9,7 +9,7 @@ This module is for deploying a highly available MongoDB cluster on Kubernetes us
 
 |  MongoDB Helm Chart Version    |     K8s supported version   |  
 | :-----:                       |         :---                |
-| **13.1.5**                     |    **1.23,1.24,1.25**           |
+| **13.1.5**                     |    **1.23,1.24,1.25,1.26,1.27**           |
 
 
 ## Usage Example
@@ -19,13 +19,21 @@ module "mongodb" {
   source                   = "saturnops/mongodb/kubernetes"
   cluster_name             = "prod-cluster"
   mongodb_config = {
-  name               = "mongo"
-  values_yaml        = ""
-  environment        = "prod"
-  volume_size        = "10Gi"
-  architecture       = "replicaset"
-  replica_count      = 2
-  storage_class_name = "gp3"  
+  name                             = "mongo"
+  values_yaml                      = ""
+  environment                      = "prod"
+  volume_size                      = "10Gi"
+  architecture                     = "replicaset"
+  replica_count                    = 2
+  storage_class_name               = "gp3"
+  store_password_to_secret_manager = true
+  }
+  mongodb_custom_credentials_enabled = true
+  mongodb_custom_credentials_config = {
+    root_user                = "root"
+    root_password            = "NCPFUKEMd7rrWuvMAa73"
+    metric_exporter_user     = "mongodb_exporter"
+    metric_exporter_password = "nvAHhm1uGQNYWVw6ZyAH"
   }
   mongodb_backup_enabled   = true
   mongodb_backup_config = {
@@ -61,7 +69,7 @@ The required IAM permissions to create resources from this module can be found [
   5. To deploy Prometheus/Grafana, please follow the installation instructions for each tool in their respective documentation.
   6. Once Prometheus and Grafana are deployed, the exporter can be configured to scrape metrics data from your application or system and send it to Prometheus.
   7. Finally, you can use Grafana to create custom dashboards and visualize the metrics data collected by Prometheus.
-  8. This module is compatible with EKS version 1.23, which is great news for users deploying the module on an EKS cluster running that version. Review the module's documentation, meet specific configuration requirements, and test thoroughly after deployment to ensure everything works as expected.
+  8. This module is compatible with EKS version 1.23,1.24,1.25,1.26 and 1.27 which is great news for users deploying the module on an EKS cluster running that version. Review the module's documentation, meet specific configuration requirements, and test thoroughly after deployment to ensure everything works as expected.
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
 
@@ -105,7 +113,9 @@ No requirements.
 | <a name="input_create_namespace"></a> [create\_namespace](#input\_create\_namespace) | Specify whether or not to create the namespace if it does not already exist. Set it to true to create the namespace. | `string` | `true` | no |
 | <a name="input_mongodb_backup_config"></a> [mongodb\_backup\_config](#input\_mongodb\_backup\_config) | Configuration options for Mongodb database backups. It includes properties such as the S3 bucket URI, the S3 bucket region, and the cron expression for full backups. | `any` | <pre>{<br>  "bucket_uri": "",<br>  "cron_for_full_backup": "*/5 * * * *",<br>  "s3_bucket_region": "us-east-2"<br>}</pre> | no |
 | <a name="input_mongodb_backup_enabled"></a> [mongodb\_backup\_enabled](#input\_mongodb\_backup\_enabled) | Specifies whether to enable backups for Mongodb database. | `bool` | `false` | no |
-| <a name="input_mongodb_config"></a> [mongodb\_config](#input\_mongodb\_config) | Specify the configuration settings for Mongodb, including the name, environment, storage options, replication settings, and custom YAML values. | `any` | <pre>{<br>  "architecture": "",<br>  "environment": "",<br>  "name": "",<br>  "replica_count": 2,<br>  "storage_class_name": "",<br>  "values_yaml": "",<br>  "volume_size": ""<br>}</pre> | no |
+| <a name="input_mongodb_config"></a> [mongodb\_config](#input\_mongodb\_config) | Specify the configuration settings for Mongodb, including the name, environment, storage options, replication settings, and custom YAML values. | `any` | <pre>{<br>  "architecture": "",<br>  "environment": "",<br>  "name": "",<br>  "replica_count": 2,<br>  "storage_class_name": "",<br>  "store_password_to_secret_manager": true,<br>  "values_yaml": "",<br>  "volume_size": ""<br>}</pre> | no |
+| <a name="input_mongodb_custom_credentials_config"></a> [mongodb\_custom\_credentials\_config](#input\_mongodb\_custom\_credentials\_config) | Specify the configuration settings for Mongodb to pass custom credentials during creation. | `any` | <pre>{<br>  "metric_exporter_password": "",<br>  "metric_exporter_user": "",<br>  "root_password": "",<br>  "root_user": ""<br>}</pre> | no |
+| <a name="input_mongodb_custom_credentials_enabled"></a> [mongodb\_custom\_credentials\_enabled](#input\_mongodb\_custom\_credentials\_enabled) | Specifies whether to enable custom credentials for MongoDB database. | `bool` | `false` | no |
 | <a name="input_mongodb_exporter_config"></a> [mongodb\_exporter\_config](#input\_mongodb\_exporter\_config) | Specify whether or not to deploy Mongodb exporter to collect Mongodb metrics for monitoring in Grafana. | `any` | <pre>{<br>  "version": "2.9.0"<br>}</pre> | no |
 | <a name="input_mongodb_exporter_enabled"></a> [mongodb\_exporter\_enabled](#input\_mongodb\_exporter\_enabled) | Specify whether or not to deploy Mongodb exporter to collect Mongodb metrics for monitoring in Grafana. | `bool` | `false` | no |
 | <a name="input_mongodb_restore_config"></a> [mongodb\_restore\_config](#input\_mongodb\_restore\_config) | Configuration options for restoring dump to the Mongodb database. | `any` | <pre>{<br>  "bucket_uri": "s3://mymongo/mongodumpfull_20230424_112501.gz",<br>  "file_name": "",<br>  "s3_bucket_region": "us-east-2"<br>}</pre> | no |
@@ -118,7 +128,8 @@ No requirements.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_mongodb"></a> [mongodb](#output\_mongodb) | MongoDB\_Info |
+| <a name="output_mongodb_credential"></a> [mongodb\_credential](#output\_mongodb\_credential) | MongoDB credentials used for accessing the MongoDB database. |
+| <a name="output_mongodb_endpoints"></a> [mongodb\_endpoints](#output\_mongodb\_endpoints) | MongoDB endpoints in the Kubernetes cluster. |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 
 

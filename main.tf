@@ -3,11 +3,13 @@ locals {
 }
 
 resource "random_password" "mongodb_root_password" {
+  count   = var.mongodb_custom_credentials_enabled ? 0 : 1
   length  = 20
   special = false
 }
 
 resource "random_password" "mongodb_exporter_password" {
+  count   = var.mongodb_custom_credentials_enabled ? 0 : 1
   length  = 20
   special = false
 }
@@ -37,31 +39,31 @@ resource "helm_release" "mongodb" {
       replicacount               = var.mongodb_config.replica_count,
       arbiterValue               = local.arbiterValue,
       storage_class_name         = var.mongodb_config.storage_class_name,
-      mongodb_exporter_password  = random_password.mongodb_exporter_password.result,
-      mongodb_root_user_password = random_password.mongodb_root_password.result
+      mongodb_exporter_password  = var.mongodb_custom_credentials_enabled ? var.mongodb_custom_credentials_config.metric_exporter_password : random_password.mongodb_exporter_password[0].result,
+      mongodb_root_user_password = var.mongodb_custom_credentials_enabled ? var.mongodb_custom_credentials_config.root_password : random_password.mongodb_root_password[0].result
     }),
     var.mongodb_config.values_yaml
   ]
 }
 
 module "aws" {
-  source                     = "./provider/aws"
-  count                      = var.bucket_provider_type == "s3" ? 1 : 0
-  mongodb_config             = var.mongodb_config
-  recovery_window_aws_secret = var.recovery_window_aws_secret
-  cluster_name               = var.cluster_name
-  root_password              = random_password.mongodb_root_password.result
-  metric_exporter_pasword    = random_password.mongodb_exporter_password.result
+  source                             = "./provider/aws"
+  count                              = var.bucket_provider_type == "s3" ? 1 : 0
+  mongodb_config                     = var.mongodb_config
+  recovery_window_aws_secret         = var.recovery_window_aws_secret
+  cluster_name                       = var.cluster_name
+  mongodb_custom_credentials_enabled = var.mongodb_custom_credentials_enabled
+  mongodb_custom_credentials_config  = var.mongodb_custom_credentials_config
 }
 
 module "gcp" {
-  source                  = "./provider/gcp"
-  count                   = var.bucket_provider_type == "gcs" ? 1 : 0
-  project_id              = var.project_id
-  environment             = var.mongodb_config.environment
-  mongodb_config          = var.mongodb_config
-  root_password           = random_password.mongodb_root_password.result
-  metric_exporter_pasword = random_password.mongodb_exporter_password.result
+  source                             = "./provider/gcp"
+  count                              = var.bucket_provider_type == "gcs" ? 1 : 0
+  project_id                         = var.project_id
+  environment                        = var.mongodb_config.environment
+  mongodb_config                     = var.mongodb_config
+  mongodb_custom_credentials_enabled = var.mongodb_custom_credentials_enabled
+  mongodb_custom_credentials_config  = var.mongodb_custom_credentials_config
 }
 
 resource "helm_release" "mongodb_backup" {
@@ -73,7 +75,7 @@ resource "helm_release" "mongodb_backup" {
   namespace  = var.namespace
   values = [
     templatefile("${path.module}/helm/values/backup/values.yaml", {
-      mongodb_root_user_password = random_password.mongodb_root_password.result,
+      mongodb_root_user_password = var.mongodb_custom_credentials_enabled ? var.mongodb_custom_credentials_config.root_password : random_password.mongodb_root_password[0].result,
       bucket_uri                 = var.mongodb_backup_config.bucket_uri,
       s3_bucket_region           = var.bucket_provider_type == "s3" ? var.mongodb_backup_config.s3_bucket_region : "",
       cron_for_full_backup       = var.mongodb_backup_config.cron_for_full_backup,
@@ -93,7 +95,7 @@ resource "helm_release" "mongodb_restore" {
   namespace  = var.namespace
   values = [
     templatefile("${path.module}/helm/values/restore/values.yaml", {
-      mongodb_root_user_password = random_password.mongodb_root_password.result,
+      mongodb_root_user_password = var.mongodb_custom_credentials_enabled ? var.mongodb_custom_credentials_config.root_password : random_password.mongodb_root_password[0].result,
       bucket_uri                 = var.mongodb_restore_config.bucket_uri,
       file_name                  = var.mongodb_restore_config.file_name,
       s3_bucket_region           = var.bucket_provider_type == "s3" ? var.mongodb_restore_config.s3_bucket_region : "",
@@ -114,7 +116,7 @@ resource "helm_release" "mongodb_exporter" {
   repository = "https://prometheus-community.github.io/helm-charts"
   values = [
     templatefile("${path.module}/helm/values/exporter/values.yaml", {
-      mongodb_exporter_password = "${random_password.mongodb_exporter_password.result}"
+      mongodb_exporter_password = var.mongodb_custom_credentials_enabled ? var.mongodb_custom_credentials_config.metric_exporter_password : "${random_password.mongodb_exporter_password[0].result}"
       service_monitor_namespace = var.namespace
     }),
     var.mongodb_config.values_yaml
