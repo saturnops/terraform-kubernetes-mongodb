@@ -31,9 +31,9 @@ resource "aws_secretsmanager_secret_version" "mongodb_root_password" {
     }) : jsonencode(
     {
       "root_user" : "root",
-      "root_password" : "${random_password.mongodb_root_password[0].result}",
+      "root_password" : "${var.root_password}",
       "metric_exporter_user" : "mongodb_exporter",
-      "metric_exporter_password" : "${random_password.mongodb_exporter_password[0].result}"
+      "metric_exporter_password" : "${var.metric_exporter_pasword}"
   })
 }
 

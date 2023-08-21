@@ -54,6 +54,8 @@ module "aws" {
   cluster_name                       = var.cluster_name
   mongodb_custom_credentials_enabled = var.mongodb_custom_credentials_enabled
   mongodb_custom_credentials_config  = var.mongodb_custom_credentials_config
+  root_password                      = var.mongodb_custom_credentials_enabled ? "" : random_password.mongodb_root_password[0].result
+  metric_exporter_pasword            = var.mongodb_custom_credentials_enabled ? "" : random_password.mongodb_exporter_password[0].result
 }
 
 module "gcp" {
@@ -64,6 +66,8 @@ module "gcp" {
   mongodb_config                     = var.mongodb_config
   mongodb_custom_credentials_enabled = var.mongodb_custom_credentials_enabled
   mongodb_custom_credentials_config  = var.mongodb_custom_credentials_config
+  root_password                      = var.mongodb_custom_credentials_enabled ? "" : random_password.mongodb_root_password[0].result
+  metric_exporter_pasword            = var.mongodb_custom_credentials_enabled ? "" : random_password.mongodb_exporter_password[0].result
 }
 
 resource "helm_release" "mongodb_backup" {
