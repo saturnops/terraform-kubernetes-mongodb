@@ -13,7 +13,6 @@ locals {
 module "mongodb" {
   source       = "saturnops/mongodb/kubernetes"
   cluster_name = "dev-cluster"
-  project_id   = "" #for gcp
   mongodb_config = {
     name                             = local.name
     values_yaml                      = file("./helm/values.yaml")
@@ -31,19 +30,20 @@ module "mongodb" {
     metric_exporter_user     = "mongodb_exporter"
     metric_exporter_password = "nvAHhm1uGQNYWVw6ZyAH"
   }
-  bucket_provider_type   = "gcs"
   mongodb_backup_enabled = true
   mongodb_backup_config = {
-    bucket_uri           = "gs://mongo-backup-skaf"
-    s3_bucket_region     = ""
+    s3_bucket_uri        = "s3://bucket_name"
+    s3_bucket_region     = "bucket_region"
     cron_for_full_backup = "* * * * *"
   }
   mongodb_restore_enabled = true
   mongodb_restore_config = {
-    bucket_uri       = "gs://mongo-backup-skaf/mongodumpfull_20230710_132301.gz"
-    s3_bucket_region = ""
-    file_name        = "mongodumpfull_20230710_132301.gz"
-
+    s3_bucket_uri              = "s3://bucket_name/filename"
+    s3_bucket_region           = "bucket_region"
+    full_restore_enable        = true
+    file_name_full             = "filename"
+    incremental_restore_enable = false
+    file_name_incremental      = ""
   }
   mongodb_exporter_enabled = true
 }
