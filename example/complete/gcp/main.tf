@@ -7,13 +7,30 @@ locals {
     Expires    = "Never"
     Department = "Engineering"
   }
-  store_password_to_secret_manager = true
+  store_password_to_secret_manager   = true
+  mongodb_custom_credentials_enabled = true
+  mongodb_custom_credentials_config = {
+    root_user                = "root"
+    root_password            = "NCPFUKEMd7rrWuvMAa73"
+    metric_exporter_user     = "mongodb_exporter"
+    metric_exporter_password = "nvAHhm1uGQNYWVw6ZyAH"
+  }
 }
 
+module "gcp" {
+  source                             = "../../../provider/gcp"
+  project_id                         = "fresh-sanctuary-389006" #for gcp
+  environment                        = local.environment
+  name                               = local.name
+  store_password_to_secret_manager   = local.store_password_to_secret_manager
+  mongodb_custom_credentials_enabled = local.mongodb_custom_credentials_enabled
+  mongodb_custom_credentials_config  = local.mongodb_custom_credentials_config
+}
+
+
 module "mongodb" {
-  source       = "saturnops/mongodb/kubernetes"
-  cluster_name = ""
-  project_id   = "" #for gcp
+  source       = "../../../" #"saturnops/mongodb/kubernetes"
+  cluster_name = "skaf-dev-gke-cluster"
   mongodb_config = {
     name                             = local.name
     values_yaml                      = file("./helm/values.yaml")
@@ -24,15 +41,14 @@ module "mongodb" {
     storage_class_name               = "standard"
     store_password_to_secret_manager = local.store_password_to_secret_manager
   }
-  mongodb_custom_credentials_enabled = true
-  mongodb_custom_credentials_config = {
-    root_user                = "root"
-    root_password            = "NCPFUKEMd7rrWuvMAa73"
-    metric_exporter_user     = "mongodb_exporter"
-    metric_exporter_password = "nvAHhm1uGQNYWVw6ZyAH"
-  }
-  bucket_provider_type   = "gcs"
-  mongodb_backup_enabled = true
+  mongodb_custom_credentials_enabled = local.mongodb_custom_credentials_enabled
+  mongodb_custom_credentials_config  = local.mongodb_custom_credentials_config
+  root_password                      = local.mongodb_custom_credentials_enabled ? "" : module.gcp.root_password
+  metric_exporter_pasword            = local.mongodb_custom_credentials_enabled ? "" : module.gcp.metric_exporter_pasword
+  bucket_provider_type               = "gcs"
+  service_account_backup             = module.gcp.service_account_backup
+  service_account_restore            = module.gcp.service_account_restore
+  mongodb_backup_enabled             = true
   mongodb_backup_config = {
     bucket_uri           = "gs://mongo-backup-skaf"
     s3_bucket_region     = ""

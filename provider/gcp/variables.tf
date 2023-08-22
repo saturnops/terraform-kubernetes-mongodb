@@ -4,6 +4,12 @@ variable "project_id" {
   default     = ""
 }
 
+variable "name" {
+  description = "Name identifier for module to be added as suffix to resources"
+  type        = string
+  default     = "test"
+}
+
 variable "environment" {
   description = "Environment in which the infrastructure is being deployed (e.g., production, staging, development)"
   type        = string
@@ -34,30 +40,6 @@ variable "gcp_ksa_restore_name" {
   default     = "sa-mongo-restore"
 }
 
-variable "root_password" {
-  description = "Root user password for MySQL"
-  type        = string
-}
-
-variable "metric_exporter_pasword" {
-  description = "Password for the mongo_exporter user"
-  type        = string
-}
-
-variable "mongodb_config" {
-  type = any
-  default = {
-    name                             = ""
-    environment                      = ""
-    volume_size                      = ""
-    architecture                     = ""
-    replica_count                    = 2
-    values_yaml                      = ""
-    storage_class_name               = ""
-    store_password_to_secret_manager = true
-  }
-  description = "Specify the configuration settings for Mongodb, including the name, environment, storage options, replication settings, and custom YAML values."
-}
 
 variable "mongodb_custom_credentials_enabled" {
   type        = bool
@@ -74,4 +56,10 @@ variable "mongodb_custom_credentials_config" {
     metric_exporter_password = ""
   }
   description = "Specify the configuration settings for Mongodb to pass custom credentials during creation."
+}
+
+variable "store_password_to_secret_manager" {
+  type        = bool
+  default     = false
+  description = "Specifies whether to store the credentials in GCP secret manager."
 }

@@ -123,3 +123,39 @@ variable "bucket_provider_type" {
   default     = "gcs"
   description = "Choose what type of provider you want (s3, gcs)"
 }
+
+variable "root_password" {
+  description = "Root password for MongoDB"
+  type        = string
+  default     = ""
+}
+
+variable "metric_exporter_pasword" {
+  description = "Metric exporter password for MongoDB"
+  type        = string
+  default     = ""
+}
+
+variable "iam_role_arn_backup" {
+  description = "IAM role ARN for backup (AWS)"
+  type        = string
+  default     = ""
+}
+
+variable "service_account_backup" {
+  description = "Service account for backup (GCP)"
+  type        = string
+  default     = ""
+}
+
+variable "iam_role_arn_restore" {
+  description = "IAM role ARN for restore (AWS)"
+  type        = string
+  default     = ""
+}
+
+variable "service_account_restore" {
+  description = "Service account for restore (GCP)"
+  type        = string
+  default     = ""
+}

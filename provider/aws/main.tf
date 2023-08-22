@@ -6,6 +6,18 @@ locals {
   )
 }
 
+resource "random_password" "mongodb_root_password" {
+  count   = var.mongodb_custom_credentials_enabled ? 0 : 1
+  length  = 20
+  special = false
+}
+
+resource "random_password" "mongodb_exporter_password" {
+  count   = var.mongodb_custom_credentials_enabled ? 0 : 1
+  length  = 20
+  special = false
+}
+
 data "aws_caller_identity" "current" {}
 
 data "aws_eks_cluster" "kubernetes_cluster" {
@@ -14,13 +26,13 @@ data "aws_eks_cluster" "kubernetes_cluster" {
 
 
 resource "aws_secretsmanager_secret" "mongodb_user_password" {
-  count                   = var.mongodb_config.store_password_to_secret_manager ? 1 : 0
-  name                    = format("%s/%s/%s", var.mongodb_config.environment, var.mongodb_config.name, "mongodb")
+  count                   = var.store_password_to_secret_manager ? 1 : 0
+  name                    = format("%s/%s/%s", var.environment, var.name, "mongodb")
   recovery_window_in_days = var.recovery_window_aws_secret
 }
 
 resource "aws_secretsmanager_secret_version" "mongodb_root_password" {
-  count     = var.mongodb_config.store_password_to_secret_manager ? 1 : 0
+  count     = var.store_password_to_secret_manager ? 1 : 0
   secret_id = aws_secretsmanager_secret.mongodb_user_password[0].id
   secret_string = var.mongodb_custom_credentials_enabled ? jsonencode(
     {
@@ -31,14 +43,14 @@ resource "aws_secretsmanager_secret_version" "mongodb_root_password" {
     }) : jsonencode(
     {
       "root_user" : "root",
-      "root_password" : "${var.root_password}",
+      "root_password" : "${random_password.mongodb_root_password[0].result}",
       "metric_exporter_user" : "mongodb_exporter",
-      "metric_exporter_password" : "${var.metric_exporter_pasword}"
+      "metric_exporter_password" : "${random_password.mongodb_exporter_password[0].result}"
   })
 }
 
 resource "aws_iam_role" "mongo_backup_role" {
-  name = format("%s-%s-%s", var.cluster_name, var.mongodb_config.name, "mongodb-backup")
+  name = format("%s-%s-%s", var.cluster_name, var.name, "mongodb-backup")
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
@@ -80,7 +92,7 @@ resource "aws_iam_role" "mongo_backup_role" {
 }
 
 resource "aws_iam_role" "mongo_restore_role" {
-  name = format("%s-%s-%s", var.cluster_name, var.mongodb_config.name, "mongodb-restore")
+  name = format("%s-%s-%s", var.cluster_name, var.name, "mongodb-restore")
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
@@ -119,15 +131,4 @@ resource "aws_iam_role" "mongo_restore_role" {
       ]
     })
   }
-}
-
-
-output "iam_role_arn_backup" {
-  value       = aws_iam_role.mongo_backup_role.arn
-  description = "IAM role arn for mongo backup"
-}
-
-output "iam_role_arn_restore" {
-  value       = aws_iam_role.mongo_restore_role.arn
-  description = "IAM role arn for mongo restore"
 }
