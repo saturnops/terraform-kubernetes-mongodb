@@ -159,3 +159,44 @@ variable "service_account_restore" {
   type        = string
   default     = ""
 }
+
+variable "resource_group_name" {
+  description = "Azure Resource Group name"
+  type        = string
+  default     = ""
+}
+
+variable "resource_group_location" {
+  description = "Azure region"
+  type        = string
+  default     = "East US"
+}
+variable "azure_storage_account_name" {
+  description = "Azure storage account name"
+  type        = string
+  default     = ""
+}
+
+variable "azure_storage_account_key" {
+  description = "Azure storage account key"
+  type        = string
+  default     = ""
+}
+
+variable "azure_container_name" {
+  description = "Azure container name"
+  type        = string
+  default     = ""
+}
+
+variable "az_account_backup" {
+  description = "Azure user managed account backup identity"
+  type        = string
+  default     = ""
+}
+
+variable "az_account_restore" {
+  description = "Azure user managed account restore identity"
+  type        = string
+  default     = ""
+}

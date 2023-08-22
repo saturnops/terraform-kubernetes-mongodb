@@ -17,7 +17,7 @@ spec:
           serviceAccountName: sa-mongo-backup
           containers:
           - name: backup-mongodb
-            image: saturnops/mongodb-backup:v3
+            image: saturnops/mongodb-backup:v5
             env:
             - name: MONGODB_URI
               value: mongodb://{{ .Values.auth.rootUser }}:{{ .Values.auth.rootPassword }}@mongodb-0.mongodb-headless.{{ .Release.Namespace }}.svc.cluster.local:27017

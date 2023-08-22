@@ -8,7 +8,7 @@ spec:
       serviceAccountName: sa-mongo-restore
       containers:
           - name: restore-mongodb
-            image: saturnops/mongodb-restore:v3
+            image: saturnops/mongodb-restore:v5
             env:
             - name: MONGO_URI
               value: mongodb://{{ .Values.auth.rootUser }}:{{ .Values.auth.rootPassword }}@mongodb-0.mongodb-headless.{{ .Release.Namespace }}.svc.cluster.local:27017
