@@ -4,32 +4,6 @@ data "azurerm_subscription" "current" {}
 
 data "azurerm_subscription" "primary" {}
 
-# resource "azurerm_role_definition" "blob_storage_access" {
-#   name        = "BlobStorageAccess"
-#   description = "Role definition for accessing Azure Blob Storage"
-#   scope       = "/subscriptions/${data.azurerm_subscription.current.subscription_id}"
-
-#   permissions {
-#     actions = [
-#       "Microsoft.Storage/storageAccounts/blobServices/containers/read",
-#       "Microsoft.Storage/storageAccounts/blobServices/containers/write",
-#       "Microsoft.Storage/storageAccounts/blobServices/containers/delete",
-#     ]
-
-#     not_actions = []
-#   }
-
-#   assignable_scopes = [
-#     "/subscriptions/${data.azurerm_subscription.current.subscription_id}",
-#   ]
-# }
-
-# resource "azurerm_role_assignment" "blob_storage_access_assignment" {
-#   principal_id   = azurerm_user_assigned_identity.mongo_backup_identity.principal_id
-#   role_definition_name = azurerm_role_definition.blob_storage_access.name
-#   scope          = "/subscriptions/${data.azurerm_subscription.current.subscription_id}"
-# }
-
 resource "random_password" "mongodb_root_password" {
   count   = var.mongodb_custom_credentials_enabled ? 0 : 1
   length  = 20
