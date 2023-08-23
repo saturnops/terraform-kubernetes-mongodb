@@ -18,8 +18,8 @@ locals {
 }
 
 module "gcp" {
-  source                             = "../../../provider/gcp"
-  project_id                         = "fresh-sanctuary-389006" #for gcp
+  source                             = "saturnops/mongodb/kubernetes//provider/gcp"
+  project_id                         = "fresh-sanctuary-387476" #for gcp
   environment                        = local.environment
   name                               = local.name
   store_password_to_secret_manager   = local.store_password_to_secret_manager
@@ -29,8 +29,8 @@ module "gcp" {
 
 
 module "mongodb" {
-  source       = "../../../" #"saturnops/mongodb/kubernetes"
-  cluster_name = "skaf-dev-gke-cluster"
+  source       = "saturnops/mongodb/kubernetes"
+  cluster_name = "dev-gke-cluster"
   mongodb_config = {
     name                             = local.name
     values_yaml                      = file("./helm/values.yaml")
@@ -50,13 +50,13 @@ module "mongodb" {
   service_account_restore            = module.gcp.service_account_restore
   mongodb_backup_enabled             = true
   mongodb_backup_config = {
-    bucket_uri           = "gs://mongo-backup-skaf"
+    bucket_uri           = "gs://mongo-backup-dev"
     s3_bucket_region     = ""
     cron_for_full_backup = "* * * * *"
   }
   mongodb_restore_enabled = true
   mongodb_restore_config = {
-    bucket_uri       = "gs://mongo-backup-skaf/mongodumpfull_20230710_132301.gz"
+    bucket_uri       = "gs://mongo-backup-dev/mongodumpfull_20230710_132301.gz"
     s3_bucket_region = ""
     file_name        = "mongodumpfull_20230710_132301.gz"
 

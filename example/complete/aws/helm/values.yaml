@@ -3,7 +3,7 @@ affinity:
     requiredDuringSchedulingIgnoredDuringExecution:
         nodeSelectorTerms:
         - matchExpressions:
-          - key: "Addon-Services"
+          - key: "Data-Services"
             operator: In
             values:
             - "true"

@@ -19,6 +19,7 @@ No requirements.
 
 | Name | Source | Version |
 |------|--------|---------|
+| <a name="module_gcp"></a> [gcp](#module\_gcp) | saturnops/mongodb/kubernetes//provider/gcp | n/a |
 | <a name="module_mongodb"></a> [mongodb](#module\_mongodb) | saturnops/mongodb/kubernetes | n/a |
 
 ## Resources
