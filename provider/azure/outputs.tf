@@ -4,7 +4,7 @@ output "az_account_backup" {
 }
 
 output "az_account_restore" {
-  value       = azurerm_user_assigned_identity.mongo_backup_identity.client_id
+  value       = azurerm_user_assigned_identity.mongo_restore_identity.client_id
   description = "Azure User Assigned Identity for restore"
 }
 

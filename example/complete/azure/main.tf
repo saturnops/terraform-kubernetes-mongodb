@@ -16,26 +16,27 @@ locals {
     metric_exporter_password = "nvAHhm1uGQNYWVw6ZyAH"
   }
 
-  azure_storage_account_name = "skaftest"
-  azure_container_name       = "mongodb-backup-conatiner"
+  azure_storage_account_name = ""
+  azure_container_name       = ""
 }
 
 module "azure" {
-  source                             = "../../../provider/azure"
-  resource_group_name                = "prod-skaf-rg"
-  resource_group_location            = "eastus"
+  source                             = "saturnops/mongodb/kubernetes//provider/azure"
+  resource_group_name                = ""
+  resource_group_location            = ""
   name                               = local.name
   environment                        = local.environment
   mongodb_custom_credentials_enabled = local.mongodb_custom_credentials_enabled
   mongodb_custom_credentials_config  = local.mongodb_custom_credentials_config
   store_password_to_secret_manager   = local.store_password_to_secret_manager
+  storage_account_name               = local.azure_storage_account_name
 }
 
 module "mongodb" {
   source                  = "saturnops/mongodb/kubernetes"
-  cluster_name            = "prod-skaf-aks"
-  resource_group_name     = "prod-skaf-rg"
-  resource_group_location = "eastus"
+  cluster_name            = ""
+  resource_group_name     = ""
+  resource_group_location = ""
   mongodb_config = {
     name                             = local.name
     values_yaml                      = file("./helm/values.yaml")
@@ -48,10 +49,10 @@ module "mongodb" {
   }
   mongodb_custom_credentials_enabled = local.mongodb_custom_credentials_enabled
   mongodb_custom_credentials_config  = local.mongodb_custom_credentials_config
-  root_password           = local.mongodb_custom_credentials_enabled ? "" : module.azure.root_password
-  metric_exporter_pasword = local.mongodb_custom_credentials_enabled ? "" : module.azure.metric_exporter_pasword
-  bucket_provider_type    = "azure"
-  mongodb_backup_enabled  = false
+  root_password                      = local.mongodb_custom_credentials_enabled ? "" : module.azure.root_password
+  metric_exporter_pasword            = local.mongodb_custom_credentials_enabled ? "" : module.azure.metric_exporter_pasword
+  bucket_provider_type               = "azure"
+  mongodb_backup_enabled             = false
   mongodb_backup_config = {
     bucket_uri                 = "https://${local.azure_storage_account_name}.blob.core.windows.net/${local.azure_container_name}"
     azure_storage_account_name = local.azure_storage_account_name

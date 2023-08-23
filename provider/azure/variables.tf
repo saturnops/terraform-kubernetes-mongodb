@@ -46,16 +46,6 @@ variable "azure_uai_pod_identity_restore_name" {
   default     = "pod-identity-restore"
 }
 
-# variable "root_password" {
-#   description = "Root user password for MongoDB"
-#   type        = string
-# }
-
-# variable "metric_exporter_pasword" {
-#   description = "Password for the MongoDB exporter user"
-#   type        = string
-# }
-
 variable "mongodb_config" {
   type = any
   default = {
@@ -92,4 +82,10 @@ variable "store_password_to_secret_manager" {
   type        = bool
   default     = false
   description = "Specifies whether to store the credentials in GCP secret manager."
+}
+
+variable "storage_account_name" {
+  description = "Azure storage account name"
+  type        = string
+  default     = ""
 }
