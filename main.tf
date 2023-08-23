@@ -60,7 +60,10 @@ resource "helm_release" "mongodb_backup" {
       s3_bucket_region           = var.bucket_provider_type == "s3" ? var.mongodb_backup_config.s3_bucket_region : "",
       cron_for_full_backup       = var.mongodb_backup_config.cron_for_full_backup,
       bucket_provider_type       = var.bucket_provider_type,
-      annotations                = var.bucket_provider_type == "s3" ? "eks.amazonaws.com/role-arn: ${var.iam_role_arn_backup}" : "iam.gke.io/gcp-service-account: ${var.service_account_backup}"
+      azure_storage_account_name = var.bucket_provider_type == "azure" ? var.azure_storage_account_name : ""
+      azure_storage_account_key  = var.bucket_provider_type == "azure" ? var.azure_storage_account_key : ""
+      azure_container_name       = var.bucket_provider_type == "azure" ? var.azure_container_name : ""
+      annotations                = var.bucket_provider_type == "s3" ? "eks.amazonaws.com/role-arn : ${var.iam_role_arn_backup}" : var.bucket_provider_type == "gcs" ? "iam.gke.io/gcp-service-account: ${var.service_account_backup}" : var.bucket_provider_type == "azure" ? "azure.workload.identity/client-id: ${var.az_account_backup}" : ""      
     })
   ]
 }
@@ -80,7 +83,10 @@ resource "helm_release" "mongodb_restore" {
       file_name                  = var.mongodb_restore_config.file_name,
       s3_bucket_region           = var.bucket_provider_type == "s3" ? var.mongodb_restore_config.s3_bucket_region : "",
       bucket_provider_type       = var.bucket_provider_type,
-      annotations                = var.bucket_provider_type == "s3" ? "eks.amazonaws.com/role-arn: ${var.iam_role_arn_restore}" : "iam.gke.io/gcp-service-account: ${var.service_account_restore}"
+      azure_storage_account_name = var.bucket_provider_type == "azure" ? var.azure_storage_account_name : ""
+      azure_storage_account_key  = var.bucket_provider_type == "azure" ? var.azure_storage_account_key : ""
+      azure_container_name       = var.bucket_provider_type == "azure" ? var.azure_container_name : ""
+      annotations                = var.bucket_provider_type == "s3" ? "eks.amazonaws.com/role-arn : ${var.iam_role_arn_restore}" : var.bucket_provider_type == "gcs" ? "iam.gke.io/gcp-service-account: ${var.service_account_restore}" : var.bucket_provider_type == "azure" ? "azure.workload.identity/client-id: ${var.az_account_restore}" : ""
     })
   ]
 }

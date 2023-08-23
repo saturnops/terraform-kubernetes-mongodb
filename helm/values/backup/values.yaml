@@ -6,6 +6,9 @@ auth:
 backup:
   bucket_uri: ${bucket_uri}
   aws_default_region: ${s3_bucket_region}
+  azure_storage_account_name: ${azure_storage_account_name}
+  azure_storage_account_key: ${azure_storage_account_key}
+  azure_container_name: ${azure_container_name}
   cron_for_full_backup: "${cron_for_full_backup}"
 
 annotations:

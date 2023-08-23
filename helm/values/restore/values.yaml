@@ -7,6 +7,9 @@ restore:
   bucket_uri: ${bucket_uri}
   file_name: ${file_name}
   aws_default_region: ${s3_bucket_region}
+  azure_storage_account_name: ${azure_storage_account_name}
+  azure_storage_account_key: ${azure_storage_account_key}
+  azure_container_name: ${azure_container_name}
 
 annotations:
   ${annotations}
