@@ -19,9 +19,9 @@ module "aws" {
   source                             = "saturnops/mongodb/kubernetes//provider/aws"
   environment                        = "prod"
   name                               = "mongodb"
-  store_password_to_secret_manager   = "true"
   cluster_name                       = "prod-eks"
   mongodb_custom_credentials_enabled = "true"
+  store_password_to_secret_manager   = "true"
   mongodb_custom_credentials_config  = {
     root_user                = "root"
     root_password            = "NCPFUKEMd7rrWuvMAa73"
@@ -34,7 +34,7 @@ module "mongodb" {
   source = "saturnops/mongodb/kubernetes"
   mongodb_config = {
     name                             = "mongodb"
-    values_yaml                      = file("./helm/values.yaml")
+    values_yaml                      = ""
     environment                      = "prod"
     volume_size                      = "10Gi"
     architecture                     = "replicaset"
@@ -49,22 +49,22 @@ module "mongodb" {
     metric_exporter_user     = "mongodb_exporter"
     metric_exporter_password = "nvAHhm1uGQNYWVw6ZyAH"
   }
-  root_password                      = local.mongodb_custom_credentials_enabled ? "" : module.aws.root_password
-  metric_exporter_pasword            = local.mongodb_custom_credentials_enabled ? "" : module.aws.metric_exporter_pasword
+  root_password                      = mongodb_custom_credentials_enabled ? "" : module.aws.root_password
+  metric_exporter_pasword            = mongodb_custom_credentials_enabled ? "" : module.aws.metric_exporter_pasword
   bucket_provider_type               = "s3"
   mongodb_backup_enabled             = true
   iam_role_arn_backup                = module.aws.iam_role_arn_backup
   mongodb_backup_config = {
-    bucket_uri           = "s3://mongo-demo-backup"
-    s3_bucket_region     = "us-east-2"
-    cron_for_full_backup = "* * * * *"
+    bucket_uri           = "backup-bucket-uri"
+    s3_bucket_region     = "backup-bucket-region"
+    cron_for_full_backup = "* */12 * * *"
   }
   mongodb_restore_enabled = true
   iam_role_arn_restore    = module.aws.iam_role_arn_restore
   mongodb_restore_config = {
-    bucket_uri       = "s3://mongo-demo-backup/mongodumpfull_20230523_092110.gz"
-    s3_bucket_region = "us-east-2"
-    file_name        = "mongodumpfull_20230523_092110.gz"
+    bucket_uri       = "restore-bucket-uri/restore-file-name"
+    s3_bucket_region = "restore-bucket-region"
+    file_name        = "restore-file-name"
   }
   mongodb_exporter_enabled = true
 }
