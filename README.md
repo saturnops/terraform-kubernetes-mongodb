@@ -3,11 +3,11 @@
 
 
 <br>
-This module is for deploying a highly available MongoDB cluster on Kubernetes using Helm charts. This module provides flexible configuration options to customize the MongoDB deployment such as setting the volume size, architecture, replica count, and more. It also includes options to enable MongoDB backups and restores, and to deploy MongoDB exporters for getting metrics in Grafana. Additionally, this module provides options to create a new namespace, and to configure recovery windows for AWS Secrets Manager. With this module, users can easily deploy a highly available MongoDB cluster on Kubernetes with the flexibility to customize their configurations according to their needs.
+This module deploys a highly available MongoDB cluster on Kubernetes using Helm charts. It offers flexible configurations for volume size, architecture, replica count, backups, restores, and metrics export to Grafana. <br> <br> Users can create a new namespace and configure recovery windows for AWS Secrets Manager, Azure Key Vault, and GCP Secrets Manager. It supports deployment on AWS EKS, Azure AKS, and GCP GKE, allowing for easy and customizable MongoDB setups.
 
 ## Supported Versions:
 
-|  MongoDB Helm Chart Version    |     K8s supported version   |  
+|  MongoDB Helm Chart Version    |     K8s supported version (EKS, AKS & GKE)  |  
 | :-----:                       |         :---                |
 | **13.1.5**                     |    **1.23,1.24,1.25,1.26,1.27**           |
 
@@ -56,7 +56,9 @@ module "mongodb" {
 
 
 ```
-Refer [examples](https://github.com/saturnops/terraform-kubernetes-mongodb/tree/main/examples/complete) for more details.
+Refer [AWS examples](https://github.com/saturnops/terraform-kubernetes-mongodb/tree/main/examples/complete/aws) for more details.
+Refer [Azure examples](https://github.com/saturnops/terraform-kubernetes-mongodb/tree/main/examples/complete/azure) for more details.
+Refer [GCP examples](https://github.com/saturnops/terraform-kubernetes-mongodb/tree/main/examples/complete/gcp) for more details.
 
 ## IAM Permissions
 The required IAM permissions to create resources from this module can be found [here](https://github.com/saturnops/terraform-kubernetes-mongodb/blob/main/IAM.md)
@@ -69,7 +71,7 @@ The required IAM permissions to create resources from this module can be found [
   5. To deploy Prometheus/Grafana, please follow the installation instructions for each tool in their respective documentation.
   6. Once Prometheus and Grafana are deployed, the exporter can be configured to scrape metrics data from your application or system and send it to Prometheus.
   7. Finally, you can use Grafana to create custom dashboards and visualize the metrics data collected by Prometheus.
-  8. This module is compatible with EKS version 1.23,1.24,1.25,1.26 and 1.27 which is great news for users deploying the module on an EKS cluster running that version. Review the module's documentation, meet specific configuration requirements, and test thoroughly after deployment to ensure everything works as expected.
+  8. This module is compatible with EKS, AKS & GKE which is great news for users deploying the module on an AWS, Azure & GCP cloud. Review the module's documentation, meet specific configuration requirements, and test thoroughly after deployment to ensure everything works as expected.
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
 
@@ -85,7 +87,11 @@ No requirements.
 
 ## Modules
 
-No modules.
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_aws"></a> [aws](#module\_aws) | saturnops/mongodb/kubernetes//provider/aws | n/a |
+| <a name="module_gcp"></a> [gcp](#module\_gcp) | saturnops/mongodb/kubernetes//provider/gcp | n/a |
+| <a name="module_azure"></a> [azure](#module\_azure) | saturnops/mongodb/kubernetes//provider/azure | n/a |
 
 ## Resources
 
@@ -123,9 +129,13 @@ No modules.
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | Name of the Kubernetes namespace where the Mongodb deployment will be deployed. | `string` | `"mongodb"` | no |
 | <a name="input_project_id"></a> [project\_id](#input\_project\_id) | Google Cloud project ID | `string` | `""` | no |
 | <a name="input_recovery_window_aws_secret"></a> [recovery\_window\_aws\_secret](#input\_recovery\_window\_aws\_secret) | Number of days that AWS Secrets Manager will wait before deleting a secret. This value can be set to 0 to force immediate deletion, or to a value between 7 and 30 days to allow for recovery. | `number` | `0` | no |
+| <a name="input_resource_group_location"></a> [resource\_group\_location](#input\_resource\_group\_location) | Azure region | `string` | `"East US"` | no |
+| <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Azure Resource Group name | `string` | `""` | no |
+| <a name="input_storage_account_name"></a> [storage\_account\_name](#input\_storage\_account\_name) | Azure storage account name | `string` | `""` | no |
 | <a name="input_root_password"></a> [root\_password](#input\_root\_password) | Root password for MongoDB | `string` | `""` | no |
 | <a name="input_service_account_backup"></a> [service\_account\_backup](#input\_service\_account\_backup) | Service account for backup (GCP) | `string` | `""` | no |
 | <a name="input_service_account_restore"></a> [service\_account\_restore](#input\_service\_account\_restore) | Service account for restore (GCP) | `string` | `""` | no |
+
 
 ## Outputs
 
