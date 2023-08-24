@@ -52,6 +52,7 @@ The Policy required to deploy this module:
 ```
 ## Azure Role Permissions
 
+```hcl
  permissions {
     actions = [
     "Microsoft.Authorization/roleAssignments/delete",
@@ -68,9 +69,11 @@ The Policy required to deploy this module:
     "Microsoft.Resources/subscriptions/resourcegroups/read"]
     not_actions = []
   }
+  ```
 
   ## Google IAM Permissions
 
+```hcl
  permissions = [
     "iam.serviceAccounts.create",
     "iam.serviceAccounts.delete",
@@ -79,3 +82,4 @@ The Policy required to deploy this module:
     "resourcemanager.projects.getIamPolicy",
     "resourcemanager.projects.setIamPolicy"
   ]
+  ```
