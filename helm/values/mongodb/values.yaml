@@ -153,9 +153,9 @@ auth:
   ## @param auth.passwords List of passwords for the custom users set at `auth.usernames`
   ## @param auth.databases List of custom databases to be created during the initialization
   ##
-  usernames: []
-  passwords: []
-  databases: []
+  usernames: ${custom_databases_usernames}
+  passwords: ${custom_databases_passwords}
+  databases: ${custom_databases}
   ## @param auth.username DEPRECATED: use `auth.usernames` instead
   ## @param auth.password DEPRECATED: use `auth.passwords` instead
   ## @param auth.database DEPRECATED: use `auth.databases` instead

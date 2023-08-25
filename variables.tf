@@ -6,6 +6,9 @@ variable "mongodb_config" {
     volume_size                      = ""
     architecture                     = ""
     replica_count                    = 2
+    custom_databases                 = ""
+    custom_databases_usernames       = ""
+    custom_databases_passwords       = ""
     values_yaml                      = ""
     storage_class_name               = ""
     store_password_to_secret_manager = true
@@ -92,7 +95,7 @@ variable "cluster_name" {
 
 variable "create_namespace" {
   type        = string
-  default     = true
+  default     = false
   description = "Specify whether or not to create the namespace if it does not already exist. Set it to true to create the namespace."
 }
 
@@ -130,7 +133,7 @@ variable "root_password" {
   default     = ""
 }
 
-variable "metric_exporter_pasword" {
+variable "metric_exporter_password" {
   description = "Metric exporter password for MongoDB"
   type        = string
   default     = ""

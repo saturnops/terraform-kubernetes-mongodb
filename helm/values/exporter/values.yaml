@@ -24,7 +24,7 @@ livenessProbe:
 
 # [mongodb[+srv]://][user:pass@]host1[:port1][,host2[:port2],...][/database][?options]
 mongodb:
-  uri: "mongodb://mongodb_exporter:${mongodb_exporter_password}@mongodb-0.mongodb-headless.mongodb.svc.cluster.local:27017/admin?authSource=admin"
+  uri: "mongodb://mongodb_exporter:${mongodb_exporter_password}@mongodb-0.mongodb-headless.{namespace}.svc.cluster.local:27017/admin?authSource=admin"
 
 # Name of an externally managed secret (in the same namespace) containing the connection uri as key `mongodb-uri`.
 # If this is provided, the value mongodb.uri is ignored.

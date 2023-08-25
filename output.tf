@@ -2,7 +2,7 @@ output "mongodb_endpoints" {
   description = "MongoDB endpoints in the Kubernetes cluster."
   value = {
     mongoport        = "27017",
-    mongodb_endpoint = "mongodb-headless.${var.namespace}.svc.cluster.local"
+    mongodb_endpoint = var.create_namespace ? "mongodb-headless.${var.namespace}.svc.cluster.local" : "mongodb-headless.default.svc.cluster.local"
   }
 }
 

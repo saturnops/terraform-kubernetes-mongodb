@@ -24,22 +24,25 @@ resource "kubernetes_namespace" "mongodb" {
 
 resource "helm_release" "mongodb" {
   depends_on = [kubernetes_namespace.mongodb]
-  name       = "mongodb"
+  name       = "modb"
   chart      = "mongodb"
   version    = var.chart_version
   timeout    = 600
-  namespace  = var.namespace
+  namespace  = var.create_namespace ? var.namespace : "default"
   repository = "https://charts.bitnami.com/bitnami"
   values = [
     templatefile("${path.module}/helm/values/mongodb/values.yaml", {
-      namespace                  = var.namespace,
+      namespace                  = var.create_namespace ? var.namespace : "default",
       app_version                = var.app_version,
       volume_size                = var.mongodb_config.volume_size,
       architecture               = var.mongodb_config.architecture,
       replicacount               = var.mongodb_config.replica_count,
       arbiterValue               = local.arbiterValue,
+      custom_databases           = var.mongodb_config.custom_databases
+      custom_databases_usernames = var.mongodb_config.custom_databases_usernames
+      custom_databases_passwords = var.mongodb_config.custom_databases_passwords
       storage_class_name         = var.mongodb_config.storage_class_name,
-      mongodb_exporter_password  = var.mongodb_custom_credentials_enabled ? var.mongodb_custom_credentials_config.metric_exporter_password : var.metric_exporter_pasword,
+      mongodb_exporter_password  = var.mongodb_custom_credentials_enabled ? var.mongodb_custom_credentials_config.metric_exporter_password : var.metric_exporter_password,
       mongodb_root_user_password = var.mongodb_custom_credentials_enabled ? var.mongodb_custom_credentials_config.root_password : var.root_password
     }),
     var.mongodb_config.values_yaml
@@ -52,7 +55,7 @@ resource "helm_release" "mongodb_backup" {
   name       = "mongodb-backup"
   chart      = "${path.module}/modules/backup"
   timeout    = 600
-  namespace  = var.namespace
+  namespace  = var.create_namespace ? var.namespace : "default"
   values = [
     templatefile("${path.module}/helm/values/backup/values.yaml", {
       mongodb_root_user_password = var.mongodb_custom_credentials_enabled ? var.mongodb_custom_credentials_config.root_password : var.root_password,
@@ -63,7 +66,7 @@ resource "helm_release" "mongodb_backup" {
       azure_storage_account_name = var.bucket_provider_type == "azure" ? var.azure_storage_account_name : ""
       azure_storage_account_key  = var.bucket_provider_type == "azure" ? var.azure_storage_account_key : ""
       azure_container_name       = var.bucket_provider_type == "azure" ? var.azure_container_name : ""
-      annotations                = var.bucket_provider_type == "s3" ? "eks.amazonaws.com/role-arn : ${var.iam_role_arn_backup}" : var.bucket_provider_type == "gcs" ? "iam.gke.io/gcp-service-account: ${var.service_account_backup}" : var.bucket_provider_type == "azure" ? "azure.workload.identity/client-id: ${var.az_account_backup}" : ""      
+      annotations                = var.bucket_provider_type == "s3" ? "eks.amazonaws.com/role-arn : ${var.iam_role_arn_backup}" : var.bucket_provider_type == "gcs" ? "iam.gke.io/gcp-service-account: ${var.service_account_backup}" : var.bucket_provider_type == "azure" ? "azure.workload.identity/client-id: ${var.az_account_backup}" : ""
     })
   ]
 }
@@ -75,7 +78,7 @@ resource "helm_release" "mongodb_restore" {
   name       = "mongodb-restore"
   chart      = "${path.module}/modules/restore"
   timeout    = 600
-  namespace  = var.namespace
+  namespace  = var.create_namespace ? var.namespace : "default"
   values = [
     templatefile("${path.module}/helm/values/restore/values.yaml", {
       mongodb_root_user_password = var.mongodb_custom_credentials_enabled ? var.mongodb_custom_credentials_config.root_password : var.root_password,
@@ -98,12 +101,12 @@ resource "helm_release" "mongodb_exporter" {
   chart      = "prometheus-mongodb-exporter"
   version    = var.mongodb_exporter_config.version
   timeout    = 600
-  namespace  = var.namespace
+  namespace  = var.create_namespace ? var.namespace : "default"
   repository = "https://prometheus-community.github.io/helm-charts"
   values = [
     templatefile("${path.module}/helm/values/exporter/values.yaml", {
-      mongodb_exporter_password = var.mongodb_custom_credentials_enabled ? var.mongodb_custom_credentials_config.metric_exporter_password : "${var.metric_exporter_pasword}"
-      service_monitor_namespace = var.namespace
+      mongodb_exporter_password = var.mongodb_custom_credentials_enabled ? var.mongodb_custom_credentials_config.metric_exporter_password : "${var.metric_exporter_password}"
+      service_monitor_namespace = var.create_namespace ? var.namespace : "default"
     }),
     var.mongodb_config.values_yaml
   ]
