@@ -50,7 +50,7 @@ resource "helm_release" "mongodb_backup" {
   depends_on = [helm_release.mongodb]
   count      = var.mongodb_backup_enabled ? 1 : 0
   name       = "mongodb-backup"
-  chart      = "${path.module}/backup"
+  chart      = "${path.module}/modules/backup"
   timeout    = 600
   namespace  = var.namespace
   values = [
@@ -73,7 +73,7 @@ resource "helm_release" "mongodb_restore" {
   depends_on = [helm_release.mongodb]
   count      = var.mongodb_restore_enabled ? 1 : 0
   name       = "mongodb-restore"
-  chart      = "${path.module}/restore"
+  chart      = "${path.module}/modules/restore"
   timeout    = 600
   namespace  = var.namespace
   values = [

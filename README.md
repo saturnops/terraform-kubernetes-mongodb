@@ -16,7 +16,7 @@ This module deploys a highly available MongoDB cluster on Kubernetes using Helm 
 
 ```hcl
 module "aws" {
-  source                             = "saturnops/mongodb/kubernetes//provider/aws"
+  source                             = "saturnops/mongodb/kubernetes//modules/resources/aws"
   environment                        = "prod"
   name                               = "mongodb"
   store_password_to_secret_manager   = "true"
