@@ -6,11 +6,11 @@ provider "aws" {
 }
 
 data "aws_eks_cluster" "cluster" {
-  name = "dev-skaf"
+  name = ""
 }
 
 data "aws_eks_cluster_auth" "cluster" {
-  name = "dev-skaf"
+  name = ""
 }
 
 provider "kubernetes" {

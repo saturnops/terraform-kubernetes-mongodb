@@ -19,17 +19,17 @@ locals {
   }
 }
 module "aws" {
-  source                             = "../../../modules/resources/aws"
+  source                             = "saturnops/mongodb/kubernetes//modules/resources/aws"
   environment                        = local.environment
   name                               = local.name
   store_password_to_secret_manager   = local.store_password_to_secret_manager
-  cluster_name                       = "dev-skaf"
+  cluster_name                       = ""
   mongodb_custom_credentials_enabled = local.mongodb_custom_credentials_enabled
   mongodb_custom_credentials_config  = local.mongodb_custom_credentials_config
 }
 
 module "mongodb" {
-  source           = "../../../"
+  source           = "saturnops/mongodb/kubernetes"
   namespace        = local.namespace
   create_namespace = local.create_namespace
   mongodb_config = {
