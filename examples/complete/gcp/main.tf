@@ -7,8 +7,8 @@ locals {
     Expires    = "Never"
     Department = "Engineering"
   }
-  create_namespace                   = false
-  namespace                          = ""
+  create_namespace                   = true
+  namespace                          = "mongodb"
   store_password_to_secret_manager   = true
   mongodb_custom_credentials_enabled = true
   mongodb_custom_credentials_config = {
