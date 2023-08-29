@@ -28,7 +28,7 @@ resource "helm_release" "mongodb" {
   chart      = "mongodb"
   version    = var.chart_version
   timeout    = 600
-  namespace  = var.create_namespace ? var.namespace : "default"
+  namespace  = var.namespace
   repository = "https://charts.bitnami.com/bitnami"
   values = [
     templatefile("${path.module}/helm/values/mongodb/values.yaml", {
@@ -55,7 +55,7 @@ resource "helm_release" "mongodb_backup" {
   name       = "mongodb-backup"
   chart      = "${path.module}/modules/backup"
   timeout    = 600
-  namespace  = var.create_namespace ? var.namespace : "default"
+  namespace  = var.namespace
   values = [
     templatefile("${path.module}/helm/values/backup/values.yaml", {
       mongodb_root_user_password = var.mongodb_custom_credentials_enabled ? var.mongodb_custom_credentials_config.root_password : var.root_password,
@@ -78,7 +78,7 @@ resource "helm_release" "mongodb_restore" {
   name       = "mongodb-restore"
   chart      = "${path.module}/modules/restore"
   timeout    = 600
-  namespace  = var.create_namespace ? var.namespace : "default"
+  namespace  = var.namespace
   values = [
     templatefile("${path.module}/helm/values/restore/values.yaml", {
       mongodb_root_user_password = var.mongodb_custom_credentials_enabled ? var.mongodb_custom_credentials_config.root_password : var.root_password,
@@ -101,12 +101,12 @@ resource "helm_release" "mongodb_exporter" {
   chart      = "prometheus-mongodb-exporter"
   version    = var.mongodb_exporter_config.version
   timeout    = 600
-  namespace  = var.create_namespace ? var.namespace : "default"
+  namespace  = var.namespace
   repository = "https://prometheus-community.github.io/helm-charts"
   values = [
     templatefile("${path.module}/helm/values/exporter/values.yaml", {
       mongodb_exporter_password = var.mongodb_custom_credentials_enabled ? var.mongodb_custom_credentials_config.metric_exporter_password : "${var.metric_exporter_password}"
-      service_monitor_namespace = var.create_namespace ? var.namespace : "default"
+      service_monitor_namespace = var.namespace
     }),
     var.mongodb_config.values_yaml
   ]
