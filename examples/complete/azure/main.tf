@@ -7,6 +7,8 @@ locals {
     Expires    = "Never"
     Department = "Engineering"
   }
+  create_namespace                   = true
+  namespace                          = "mongodb"
   store_password_to_secret_manager   = true
   mongodb_custom_credentials_enabled = true
   mongodb_custom_credentials_config = {
@@ -35,22 +37,28 @@ module "azure" {
 module "mongodb" {
   source                  = "saturnops/mongodb/kubernetes"
   cluster_name            = ""
+  namespace               = local.namespace
+  create_namespace        = local.create_namespace
   resource_group_name     = ""
   resource_group_location = ""
   mongodb_config = {
     name                             = local.name
+    namespace                        = local.namespace
     values_yaml                      = file("./helm/values.yaml")
     volume_size                      = "10Gi"
     architecture                     = "replicaset"
     replica_count                    = 1
     environment                      = local.environment
+    custom_databases                 = "['db1', 'db2']"
+    custom_databases_usernames       = "['admin', 'admin']"
+    custom_databases_passwords       = "['pass1', 'pass2']"
     storage_class_name               = "infra-service-sc"
     store_password_to_secret_manager = local.store_password_to_secret_manager
   }
   mongodb_custom_credentials_enabled = local.mongodb_custom_credentials_enabled
   mongodb_custom_credentials_config  = local.mongodb_custom_credentials_config
   root_password                      = local.mongodb_custom_credentials_enabled ? "" : module.azure.root_password
-  metric_exporter_pasword            = local.mongodb_custom_credentials_enabled ? "" : module.azure.metric_exporter_pasword
+  metric_exporter_password           = local.mongodb_custom_credentials_enabled ? "" : module.azure.metric_exporter_pasword
   bucket_provider_type               = "azure"
   mongodb_backup_enabled             = false
   mongodb_backup_config = {
