@@ -15,19 +15,34 @@ This module deploys a highly available MongoDB cluster on Kubernetes using Helm 
 ## Usage Example
 
 ```hcl
-module "aws" {
-  source                             = "saturnops/mongodb/kubernetes//modules/resources/aws"
-  environment                        = "prod"
-  name                               = "mongodb"
-  cluster_name                       = "prod-eks"
-  mongodb_custom_credentials_enabled = "true"
-  store_password_to_secret_manager   = "true"
-  mongodb_custom_credentials_config  = {
+locals {
+  name        = "mongo"
+  region      = "us-east-2"
+  environment = "prod"
+  additional_tags = {
+    Owner      = "organization_name"
+    Expires    = "Never"
+    Department = "Engineering"
+  }
+  create_namespace                   = true
+  namespace                          = "mongodb"
+  store_password_to_secret_manager   = true
+  mongodb_custom_credentials_enabled = true
+  mongodb_custom_credentials_config = {
     root_user                = "root"
     root_password            = "NCPFUKEMd7rrWuvMAa73"
     metric_exporter_user     = "mongodb_exporter"
     metric_exporter_password = "nvAHhm1uGQNYWVw6ZyAH"
   }
+}
+module "aws" {
+  source                             = "saturnops/mongodb/kubernetes//modules/resources/aws"
+  environment                        = local.environment
+  name                               = local.name
+  store_password_to_secret_manager   = local.store_password_to_secret_manager
+  cluster_name                       = ""
+  mongodb_custom_credentials_enabled = local.mongodb_custom_credentials_enabled
+  mongodb_custom_credentials_config  = local.mongodb_custom_credentials_config
 }
 
 module "mongodb" {
@@ -37,7 +52,7 @@ module "mongodb" {
   mongodb_config = {
     name                             = local.name
     namespace                        = local.namespace
-    values_yaml                      = file("./helm/values.yaml")
+    values_yaml                      = ""
     environment                      = local.environment
     volume_size                      = "10Gi"
     architecture                     = "replicaset"

@@ -32,7 +32,7 @@ resource "helm_release" "mongodb" {
   repository = "https://charts.bitnami.com/bitnami"
   values = [
     templatefile("${path.module}/helm/values/mongodb/values.yaml", {
-      namespace                  = var.create_namespace ? var.namespace : "default",
+      namespace                  = var.namespace,
       app_version                = var.app_version,
       volume_size                = var.mongodb_config.volume_size,
       architecture               = var.mongodb_config.architecture,
