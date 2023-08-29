@@ -1,0 +1,9 @@
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: "Data-Services"
+            operator: In
+            values:
+            - "true"

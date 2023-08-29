@@ -16,8 +16,8 @@ spec:
           restartPolicy: OnFailure
           serviceAccountName: sa-mongo-backup
           containers:
-          - name: backup-mongodb-full
-            image: saturnops01/mongobackup:latest
+          - name: backup-mongodb
+            image: saturnops/mongodb-backup:v5
             env:
             - name: MONGODB_URI
               value: mongodb://{{ .Values.auth.rootUser }}:{{ .Values.auth.rootPassword }}@mongodb-0.mongodb-headless.{{ .Release.Namespace }}.svc.cluster.local:27017
@@ -26,10 +26,9 @@ spec:
             - name: MONGO_BUCKET_URI
               valueFrom:
                 secretKeyRef:
-                  name: mongo
+                  name: mongo-bucket-backup
                   key: BUCKET_URI
+            - name: BUCKET_PROVIDER
+              value: {{ .Values.bucket_provider_type }}
             - name: AWS_DEFAULT_REGION
-              valueFrom:
-                secretKeyRef:
-                  name: aws
-                  key: AWS_DEFAULT_REGION
+              value: {{ .Values.backup.aws_default_region }}

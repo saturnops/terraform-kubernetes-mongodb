@@ -6,6 +6,9 @@ variable "mongodb_config" {
     volume_size                      = ""
     architecture                     = ""
     replica_count                    = 2
+    custom_databases                 = ""
+    custom_databases_usernames       = ""
+    custom_databases_passwords       = ""
     values_yaml                      = ""
     storage_class_name               = ""
     store_password_to_secret_manager = true
@@ -57,7 +60,7 @@ variable "mongodb_backup_enabled" {
 variable "mongodb_backup_config" {
   type = any
   default = {
-    s3_bucket_uri        = ""
+    bucket_uri           = ""
     s3_bucket_region     = "us-east-2"
     cron_for_full_backup = "*/5 * * * *"
   }
@@ -92,7 +95,7 @@ variable "cluster_name" {
 
 variable "create_namespace" {
   type        = string
-  default     = true
+  default     = false
   description = "Specify whether or not to create the namespace if it does not already exist. Set it to true to create the namespace."
 }
 
@@ -105,12 +108,98 @@ variable "mongodb_restore_enabled" {
 variable "mongodb_restore_config" {
   type = any
   default = {
-    s3_bucket_uri              = "s3://mymongo/mongodumpfull_20230424_112501.gz"
-    s3_bucket_region           = "us-east-2"
-    full_restore_enable        = false
-    file_name_full             = ""
-    incremental_restore_enable = false
-    file_name_incremental      = ""
+    bucket_uri       = "s3://mymongo/mongodumpfull_20230424_112501.gz"
+    s3_bucket_region = "us-east-2"
+    file_name        = ""
   }
   description = "Configuration options for restoring dump to the Mongodb database."
+}
+
+variable "project_id" {
+  description = "Google Cloud project ID"
+  type        = string
+  default     = ""
+}
+
+variable "bucket_provider_type" {
+  type        = string
+  default     = "gcs"
+  description = "Choose what type of provider you want (s3, gcs)"
+}
+
+variable "root_password" {
+  description = "Root password for MongoDB"
+  type        = string
+  default     = ""
+}
+
+variable "metric_exporter_password" {
+  description = "Metric exporter password for MongoDB"
+  type        = string
+  default     = ""
+}
+
+variable "iam_role_arn_backup" {
+  description = "IAM role ARN for backup (AWS)"
+  type        = string
+  default     = ""
+}
+
+variable "service_account_backup" {
+  description = "Service account for backup (GCP)"
+  type        = string
+  default     = ""
+}
+
+variable "iam_role_arn_restore" {
+  description = "IAM role ARN for restore (AWS)"
+  type        = string
+  default     = ""
+}
+
+variable "service_account_restore" {
+  description = "Service account for restore (GCP)"
+  type        = string
+  default     = ""
+}
+
+variable "resource_group_name" {
+  description = "Azure Resource Group name"
+  type        = string
+  default     = ""
+}
+
+variable "resource_group_location" {
+  description = "Azure region"
+  type        = string
+  default     = "East US"
+}
+variable "azure_storage_account_name" {
+  description = "Azure storage account name"
+  type        = string
+  default     = ""
+}
+
+variable "azure_storage_account_key" {
+  description = "Azure storage account key"
+  type        = string
+  default     = ""
+}
+
+variable "azure_container_name" {
+  description = "Azure container name"
+  type        = string
+  default     = ""
+}
+
+variable "az_account_backup" {
+  description = "Azure user managed account backup identity"
+  type        = string
+  default     = ""
+}
+
+variable "az_account_restore" {
+  description = "Azure user managed account restore identity"
+  type        = string
+  default     = ""
 }
