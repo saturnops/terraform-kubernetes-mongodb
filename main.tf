@@ -24,7 +24,7 @@ resource "kubernetes_namespace" "mongodb" {
 
 resource "helm_release" "mongodb" {
   depends_on = [kubernetes_namespace.mongodb]
-  name       = "modb"
+  name       = "mongodb"
   chart      = "mongodb"
   version    = var.chart_version
   timeout    = 600
