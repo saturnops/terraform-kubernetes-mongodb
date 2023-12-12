@@ -64,11 +64,11 @@ affinity:
 
 resources:
   limits:
-    cpu: 200m
-    memory: 100Mi
-  requests:
     cpu: 100m
-    memory: 50Mi
+    memory: 200Mi
+  requests:
+    cpu: 70m
+    memory: 100Mi
 
 # Extra environment variables that will be passed into the exporter pod
 env: {}
