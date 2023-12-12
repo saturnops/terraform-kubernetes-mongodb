@@ -52,7 +52,15 @@ readinessProbe:
 
 replicas: 1
 
-affinity: {}
+affinity:
+    nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+                - key: "Database-Services"
+                  operator: In
+                  values:
+                  - "true"
 
 resources:
   limits:
