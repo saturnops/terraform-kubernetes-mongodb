@@ -203,3 +203,10 @@ variable "az_account_restore" {
   type        = string
   default     = ""
 }
+
+
+variable "mongodb_exporter_values" {
+  description = "Mongo DB prometheus exporter values file"
+  type        = any
+  default     = ""
+}

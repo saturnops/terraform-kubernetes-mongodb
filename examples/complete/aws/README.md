@@ -18,7 +18,7 @@ No requirements.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_aws"></a> [aws](#module\_aws) | saturnops/mongodb/kubernetes//provider/aws | n/a |
+| <a name="module_aws"></a> [aws](#module\_aws) | saturnops/mongodb/kubernetes//modules/resources/aws | n/a |
 | <a name="module_mongodb"></a> [mongodb](#module\_mongodb) | saturnops/mongodb/kubernetes | n/a |
 
 ## Resources

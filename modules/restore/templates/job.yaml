@@ -5,6 +5,7 @@ metadata:
 spec:
   template:
     spec:
+      affinity: {{ .Values.affinity | toYaml | nindent 6 }}
       serviceAccountName: sa-mongo-restore
       containers:
           - name: restore-mongodb
@@ -25,5 +26,6 @@ spec:
               value: {{ .Values.restore.file_name | quote }}
             - name: RESTORE_FROM
               value: {{ .Values.bucket_provider_type}}
+            resources: {{ .Values.restorejob.resources | toYaml | nindent 12 }}
       restartPolicy: Never
   backoffLimit: 4
