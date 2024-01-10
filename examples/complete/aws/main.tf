@@ -68,5 +68,5 @@ module "mongodb" {
   }
   mongodb_exporter_enabled = true
   mongodb_exporter_values  = file("./helm/exporter.yaml")
-  
+
 }
