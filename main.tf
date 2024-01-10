@@ -107,6 +107,7 @@ resource "helm_release" "mongodb_exporter" {
     templatefile("${path.module}/helm/values/exporter/values.yaml", {
       mongodb_exporter_password = var.mongodb_custom_credentials_enabled ? var.mongodb_custom_credentials_config.metric_exporter_password : "${var.metric_exporter_password}"
       service_monitor_namespace = var.namespace
-    })
+    }),
+    var.mongodb_exporter_values
   ]
 }

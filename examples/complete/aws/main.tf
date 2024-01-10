@@ -22,6 +22,7 @@ module "aws" {
   source                             = "saturnops/mongodb/kubernetes//modules/resources/aws"
   environment                        = local.environment
   name                               = local.name
+  namespace                          = local.namespace
   store_password_to_secret_manager   = local.store_password_to_secret_manager
   cluster_name                       = ""
   mongodb_custom_credentials_enabled = local.mongodb_custom_credentials_enabled
@@ -66,4 +67,6 @@ module "mongodb" {
     file_name        = "mongodumpfull_20230523_092110.gz"
   }
   mongodb_exporter_enabled = true
+  mongodb_exporter_values  = file("./helm/exporter.yaml")
+  
 }
