@@ -13,7 +13,8 @@ spec:
     spec:
       template:
         spec:
-          affinity: {{ .Values.affinity | toYaml | nindent 10 }}
+          affinity:
+            {{- toYaml .Values.affinity | nindent 12 }}
           restartPolicy: OnFailure
           serviceAccountName: sa-mongo-backup
           containers:
@@ -21,7 +22,7 @@ spec:
             image: saturnops/mongodb-backup:v7
             env:
             - name: MONGODB_URI
-              value: mongodb://{{ .Values.auth.rootUser }}:{{ .Values.auth.rootPassword }}@mongodb-0.mongodb-headless.{{ .Release.Namespace }}.svc.cluster.local:27017
+              value: mongodb://{{ .Values.auth.rootUser }}:{{ .Values.auth.rootPassword }}@mongodb-headless.{{ .Release.Namespace }}.svc.cluster.local:27017
             - name: MONGO_OPLOG
               value: "true"
             - name: MONGO_BUCKET_URI
@@ -33,4 +34,5 @@ spec:
               value: {{ .Values.bucket_provider_type }}
             - name: AWS_DEFAULT_REGION
               value: {{ .Values.backup.aws_default_region }}
-            resources: {{ .Values.backupjob.resources | toYaml | nindent 12 }}
+            resources: 
+              {{- toYaml .Values.backupjob.resources | nindent 14 }}

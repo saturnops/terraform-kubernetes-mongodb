@@ -5,14 +5,15 @@ metadata:
 spec:
   template:
     spec:
-      affinity: {{ .Values.affinity | toYaml | nindent 6 }}
+      affinity:
+        {{- toYaml .Values.affinity | nindent 8 }}
       serviceAccountName: sa-mongo-restore
       containers:
           - name: restore-mongodb
             image: saturnops/mongodb-restore:v6
             env:
             - name: MONGO_URI
-              value: mongodb://{{ .Values.auth.rootUser }}:{{ .Values.auth.rootPassword }}@mongodb-0.mongodb-headless.{{ .Release.Namespace }}.svc.cluster.local:27017
+              value: mongodb://{{ .Values.auth.rootUser }}:{{ .Values.auth.rootPassword }}@mongodb-primary.{{ .Release.Namespace }}.svc.cluster.local:27017
             - name: MONGO_OPLOG
               value: "false"
             - name: AWS_DEFAULT_REGION
@@ -26,6 +27,7 @@ spec:
               value: {{ .Values.restore.file_name | quote }}
             - name: RESTORE_FROM
               value: {{ .Values.bucket_provider_type}}
-            resources: {{ .Values.restorejob.resources | toYaml | nindent 12 }}
+            resources:
+              {{- toYaml .Values.restorejob.resources | nindent 14 }}
       restartPolicy: Never
   backoffLimit: 4

@@ -67,7 +67,29 @@ clusterDomain: cluster.local
 ##       app.kubernetes.io/name: mongodb
 ##       primary: "true"
 ##
-extraDeploy: []
+extraDeploy:
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: mongodb-primary
+      namespace: ${namespace}
+      labels:
+        app.kubernetes.io/component: mongodb
+        app.kubernetes.io/instance: mongodb
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: mongodb
+    spec:
+      type: ClusterIP
+      ports:
+        - name: mongodb-primary
+          port: 27017
+          protocol: TCP
+          targetPort: mongodb
+      selector:
+        app.kubernetes.io/component: mongodb
+        app.kubernetes.io/instance: mongodb
+        app.kubernetes.io/name: mongodb
+        primary: "true"
 ## @param commonLabels Add labels to all the deployed resources (sub-charts are not considered). Evaluated as a template
 ##
 commonLabels: {}
@@ -502,23 +524,23 @@ containerSecurityContext:
 ## @param resources.limits The resources limits for MongoDB(&reg;) containers
 ## @param resources.requests The requested resources for MongoDB(&reg;) containers
 ##
-resources:
+resources: {}
   ## Example:
   ## limits:
   ##    cpu: 100m
   ##    memory: 128Mi
   ##
-  limits:
-    cpu: 1000m
-    memory: 1000Mi
+  # limits:
+  #   cpu: 1000m
+  #   memory: 1000Mi
   ## Examples:
   ## requests:
   ##    cpu: 100m
   ##    memory: 128Mi
   ##
-  requests:
-    cpu: 500m
-    memory: 500Mi
+  # requests:
+  #   cpu: 500m
+  #   memory: 500Mi
 ## @param containerPorts.mongodb MongoDB(&reg;) container port
 containerPorts:
   mongodb: 27017
@@ -620,7 +642,24 @@ initContainers: []
 ##     - name: DEBUG
 ##       value: "true"
 ##
-sidecars: []
+sidecars:
+  - name: mongo-labeler
+    image: korenlev/k8s-mongo-labeler-sidecar
+    imagePullPolicy: Always
+    env:
+      - name: LABEL_SELECTOR
+        value: "app.kubernetes.io/component=mongodb,app.kubernetes.io/instance=mongodb,app.kubernetes.io/name=mongodb"
+      - name: NAMESPACE
+        value: ${namespace}
+      - name: DEBUG
+        value: "true"
+    resources:
+      limits:
+        cpu: 100m
+        memory: 200Mi
+      requests:
+        cpu: 50m
+        memory: 100Mi
 ## @param extraVolumeMounts Optionally specify extra list of additional volumeMounts for the MongoDB(&reg;) container(s)
 ## Examples:
 ## extraVolumeMounts:
@@ -996,7 +1035,7 @@ rbac:
   ## that allows MongoDB(&reg;) pods querying the K8s API
   ## this needs to be set to 'true' to enable the mongo-labeler sidecar primary mongodb discovery
   ##
-  create: false
+  create: true
   ## @param rbac.rules Custom rules to create following the role specification
   ## The example below needs to be uncommented to use the 'mongo-labeler' sidecar for dynamic discovery of the primary mongodb pod:
   ## rules:
@@ -1010,7 +1049,16 @@ rbac:
   ##       - watch
   ##       - update
   ##
-  rules: []
+  rules:
+    - apiGroups:
+        - ""
+      resources:
+        - pods
+      verbs:
+        - get
+        - list
+        - watch
+        - update
 ## PodSecurityPolicy configuration
 ## Be sure to also set rbac.create to true, otherwise Role and RoleBinding won't be created.
 ## ref: https://kubernetes.io/docs/concepts/policy/pod-security-policy/
@@ -1304,23 +1352,23 @@ arbiter:
   ## @param arbiter.resources.limits The resources limits for Arbiter containers
   ## @param arbiter.resources.requests The requested resources for Arbiter containers
   ##
-  resources:
+  resources: {}
     ## Example:
     ## limits:
     ##    cpu: 100m
     ##    memory: 128Mi
     ##
-    limits:
-      cpu: 200m
-      memory: 500Mi
+    # limits:
+    #   cpu: 200m
+    #   memory: 500Mi
     ## Examples:
     ## requests:
     ##    cpu: 100m
     ##    memory: 128Mi
     ##
-    requests:
-      cpu: 100m
-      memory: 250Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 250Mi
   ## @param arbiter.containerPorts.mongodb MongoDB(&reg;) arbiter container port
   ##
   containerPorts:
@@ -1866,19 +1914,14 @@ metrics:
   ## @param metrics.resources.limits The resources limits for Prometheus exporter containers
   ## @param metrics.resources.requests The requested resources for Prometheus exporter containers
   ##
-  resources:
-    ## Example:
-    ## limits:
-    ##    cpu: 100m
-    ##    memory: 128Mi
-    ##
-    limits: {}
-    ## Examples:
-    ## requests:
-    ##    cpu: 100m
-    ##    memory: 128Mi
-    ##
-    requests: {}
+  resources: {}
+    # limits:
+    #    cpu: 100m
+    #    memory: 128Mi
+    # requests:
+    #    cpu: 100m
+    #    memory: 128Mi
+  ##
   ## @param metrics.containerPort Port of the Prometheus metrics container
   ##
   containerPort: 9216
@@ -1929,9 +1972,9 @@ metrics:
   ##
   readinessProbe:
     enabled: true
-    initialDelaySeconds: 5
+    initialDelaySeconds: 30
     periodSeconds: 5
-    timeoutSeconds: 1
+    timeoutSeconds: 15
     failureThreshold: 3
     successThreshold: 1
   ## Slow starting containers can be protected through startup probes
