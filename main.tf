@@ -67,7 +67,8 @@ resource "helm_release" "mongodb_backup" {
       azure_storage_account_key  = var.bucket_provider_type == "azure" ? var.azure_storage_account_key : ""
       azure_container_name       = var.bucket_provider_type == "azure" ? var.azure_container_name : ""
       annotations                = var.bucket_provider_type == "s3" ? "eks.amazonaws.com/role-arn : ${var.iam_role_arn_backup}" : var.bucket_provider_type == "gcs" ? "iam.gke.io/gcp-service-account: ${var.service_account_backup}" : var.bucket_provider_type == "azure" ? "azure.workload.identity/client-id: ${var.az_account_backup}" : ""
-    })
+    }),
+    var.mongodb_config.values_yaml
   ]
 }
 
@@ -90,7 +91,8 @@ resource "helm_release" "mongodb_restore" {
       azure_storage_account_key  = var.bucket_provider_type == "azure" ? var.azure_storage_account_key : ""
       azure_container_name       = var.bucket_provider_type == "azure" ? var.azure_container_name : ""
       annotations                = var.bucket_provider_type == "s3" ? "eks.amazonaws.com/role-arn : ${var.iam_role_arn_restore}" : var.bucket_provider_type == "gcs" ? "iam.gke.io/gcp-service-account: ${var.service_account_restore}" : var.bucket_provider_type == "azure" ? "azure.workload.identity/client-id: ${var.az_account_restore}" : ""
-    })
+    }),
+    var.mongodb_config.values_yaml
   ]
 }
 

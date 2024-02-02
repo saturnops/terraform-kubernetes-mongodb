@@ -3,10 +3,48 @@ affinity:
     requiredDuringSchedulingIgnoredDuringExecution:
         nodeSelectorTerms:
         - matchExpressions:
-          - key: "Infra-Services"
+          - key: "Addons-Services"
             operator: In
             values:
             - "true"
+
+resources:
+  limits:
+    cpu: 900m
+    memory: 800Mi
+  requests:
+    cpu: 600m
+    memory: 500Mi
+
+metrics:
+  enabled: true
+  resources:
+    limits:
+       cpu: 200m
+       memory: 528Mi
+    requests:
+       cpu: 120m
+       memory: 228Mi
+
+arbiter:
+  resources:
+    limits:
+      cpu: 200m
+      memory: 400Mi
+    requests:
+      cpu: 100m
+      memory: 250Mi
+  
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: "Addons-Services"
+              operator: In
+              values:
+              - "true"
+
 backupjob:
   resources:
     requests:
